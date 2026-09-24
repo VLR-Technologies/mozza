@@ -1,0 +1,6 @@
+import {IngredientLayer} from './IngredientLayer';
+import {FoodShape} from './FoodShape';
+import {animationAssets} from '@/data/menu-animation-data';
+import type {SceneProps} from './types';
+const layers=[{key:'bottom',top:69,height:20,start:84,delay:.15},{key:'sauce',top:66,height:8,start:73,delay:.8},{key:'patty',top:52,height:23,start:52,delay:1.3},{key:'cheese',top:48,height:15,start:40,delay:1.8},{key:'lettuce',top:41,height:17,start:24,delay:2.2},{key:'top',top:23,height:31,start:0,delay:2.6}] as const;
+export function BurgerAssembly({config,withCheese}:SceneProps){return <div className="fa-burger fa-composition"><div className="fa-food-shadow"/><div className="fa-burger-stack">{layers.filter(l=>(l.key!=='cheese'||withCheese)&&(!['lettuce','sauce'].includes(l.key)||config.variant==='zinger')).map(layer=><div key={layer.key} className={`fa-burger-layer burger-${layer.key}`} style={{top:`${layer.top}%`,left:'14%',width:'72%',height:`${layer.height}%`,'--separation':`${(layer.start-layer.top)*100/layer.height}%`,'--delay':`${layer.delay}s`} as React.CSSProperties}>{layer.key==='patty'&&config.variant!=='zinger'?<FoodShape kind="patty" variant={config.variant}/>:<IngredientLayer src={animationAssets.burger[layer.key]}/>}</div>)}</div>{config.flags?.includes('meal')&&<FoodShape kind="fries" className="burger-meal-fries" color="#e9ba54"/>}</div>;}

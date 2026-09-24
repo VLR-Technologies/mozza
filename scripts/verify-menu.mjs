@@ -1,0 +1,23 @@
+import fs from 'node:fs';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+import ts from 'typescript';
+const source=fs.readFileSync('src/data/menu-data.ts','utf8');
+const js=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
+const scope={exports:{}};vm.runInNewContext(js,scope);
+const {menuCategories,menuItems}=scope.exports;
+assert.equal(new Set(menuItems.map(x=>x.id)).size,menuItems.length,'IDs must be unique');
+assert.equal(menuCategories.length,25,'All source category groupings must remain');
+assert.equal(menuItems.length,118,'All transcribed entries, toppings and repeated source listings must remain');
+for(const item of menuItems){assert.ok(item.name&&item.sizes.length);assert.ok(item.sourcePage>=2&&item.sourcePage<=9);for(const size of item.sizes){assert.ok(size.label);assert.ok(size.price===null||Number.isInteger(size.price)&&size.price>0);if(size.price===null)assert.ok(item.manualVerification||size.label==='MRP',`${item.name}: unknown price needs a note`);}}
+const find=id=>menuItems.find(i=>i.id===id);
+assert.equal(find('boneless-tenders').sizes.filter(s=>s.price===null).length,2);
+assert.equal(find('chicken-pop-corn').sizes[0].price,null);
+assert.equal(find('snacks-chicken-pop-corn').sizes[0].price,null);
+assert.equal(find('mayonnaise-southwest-sauce').sizes[0].price,null);
+assert.equal(find('chicken-zinger-burger').sizes[1].price,175);
+assert.equal(find('basmathi-egg-ghee-pulav').sizes[1].price,345);
+assert.equal(find('chittimutyalu-chicken-ghee-pulav').sizes[2].price,750);
+assert.ok(find('veg-valcano')&&find('fruit-avacado')&&find('shake-alphanso-mango'));
+console.log(`${menuCategories.length} categories; ${menuItems.length} entries; ${menuItems.reduce((n,i)=>n+i.sizes.length,0)} variants. Menu integrity checks passed.`);
+console.log('Verification flags:',menuItems.filter(i=>i.manualVerification).map(i=>i.id).join(', '));
