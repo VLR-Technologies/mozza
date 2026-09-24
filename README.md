@@ -15,6 +15,7 @@ Open http://127.0.0.1:3000 (localhost:3000 also works on this machine).
 npm run lint
 npm run typecheck
 node scripts/verify-menu.mjs
+npm run test:images
 npm run build
 npm start
 ```
@@ -24,7 +25,7 @@ Node.js 20.9 or newer is required. Stop the development server before `npm start
 ## Routes
 
 - `/`: hero, marquee, signature dishes, four-chapter food story, category menu preview, drinks/dessert scenes, brand story, review summary, reservation request, visit and footer.
-- `/menu`: complete searchable menu, food/diet filters, sticky categories, size selection and WhatsApp draft links.
+- `/menu`: complete searchable menu with static food photography, food/diet filters, sticky categories, size selection and WhatsApp draft links.
 - `/about`: brand-focused story without invented business history.
 - `/gallery`: food gallery, category filtering, keyboard/touch lightbox.
 - `/contact`: visit details, call/WhatsApp and reservation request.
@@ -36,6 +37,7 @@ Node.js 20.9 or newer is required. Stop the development server before `npm start
 - `src/config/restaurant.ts`: confirmed Shadnagar number, optional address, hours, external URLs, rating and production origin.
 - `src/data/menu-data.ts`: 25 category groups, 118 entries, 189 variants, source pages and verification notes. Duplicate Chicken Pop Corn listings and topping rows retain the PDF's category context.
 - `src/data/food-visuals.ts`: central image paths.
+- `src/data/menu-images.ts`: category and item photography mappings plus featured menu selections.
 - `src/data/gallery-data.ts`: gallery captions and groupings; add real outlet imagery under the existing `Restaurant` category type.
 - `src/app/globals.css`: palette, typography, layouts, media queries and reduced-motion rules.
 - `src/components/ui`: shared motion, diet markers and native accessible dialog.
@@ -56,7 +58,7 @@ Set `NEXT_PUBLIC_SITE_URL` to a confirmed absolute production URL when deploymen
 
 ## Visual assets
 
-14 original generated food images, optimized to local WebP (about 3.3 MB total), are illustrative demo assets. They do not claim to depict the actual restaurant or its food. The gallery and footer disclose this. No fabricated interior images are used.
+18 original generated food images are illustrative demo assets. They do not claim to depict the actual restaurant or its food. The gallery and footer disclose this. No fabricated interior images are used.
 
 - `public/food/hero/hero-pizza.webp`
 - `public/food/pizza/chicken-pizza.webp`
@@ -72,8 +74,12 @@ Set `NEXT_PUBLIC_SITE_URL` to a confirmed absolute production URL when deploymen
 - `public/food/drinks/mojito-milkshake.webp`
 - `public/food/desserts/brownie.webp`
 - `public/food/desserts/ice-cream.webp`
+- `public/food/menu/veg-snacks.jpg`
+- `public/food/menu/veg-burger.jpg`
+- `public/food/menu/mediterranean-salad.jpg`
+- `public/food/menu/dips.jpg`
 
-Replace these with approved real food photography. Keep approximately square crops and centrally composed subjects. The burger layer animation uses six CSS masks matched to the generated layer asset; set `visualSettings.burgerLayered` to `false` in the same central file when using a standard client burger photograph. All other image swaps use the central path map without layout changes.
+Replace these with approved real food photography. Keep approximately square crops and centrally composed subjects. Menu imagery is resolved in one place, so approved replacements can be swapped without layout changes. The homepage burger story still uses six CSS masks matched to its separate layered asset; set `visualSettings.burgerLayered` to `false` when replacing that homepage asset with an ordinary client burger photograph.
 
 Official supplied logo: `public/brand/mozza-italia.png`. Unmodified supplied PDF: `public/menu/mozza-italia-menu.pdf`. Barlow Condensed and Manrope fonts are local, with OFL licenses under `public/fonts`.
 

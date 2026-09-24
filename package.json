@@ -8,7 +8,8 @@
     "start": "next start --hostname 127.0.0.1",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test:menu": "node scripts/verify-menu.mjs"
+    "test:menu": "node scripts/verify-menu.mjs",
+    "test:images": "node scripts/verify-menu-images.mjs"
   },
   "dependencies": {
     "next": "^16.2.0",
