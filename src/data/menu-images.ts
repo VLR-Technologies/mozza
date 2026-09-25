@@ -76,7 +76,6 @@ export function getMenuItemPhoto(item: MenuItem): MenuPhoto {
   if (category?.id === 'non-veg-pizza') return menuPhotos.chickenPizza;
   if (
     item.image
-    && item.image !== 'burgerLayers'
     && item.image in menuPhotos
   ) {
     return menuPhotos[item.image as MenuPhotoKey];
@@ -88,29 +87,3 @@ export function getMenuItemPhoto(item: MenuItem): MenuPhoto {
 export function getCategoryPhoto(category: MenuCategory): MenuPhoto {
   return menuPhotos[categoryPhotoKeys[category.id] || 'fries'];
 }
-
-export const featuredMenuCategories: Record<string, {
-  itemIds: string[];
-  headline: string;
-  subheadline: string;
-  sizeIndex?: number;
-}> = {
-  'veg-pizza': {itemIds: ['tandoori-paneer', 'veg-full-house', 'margarita'], headline: 'TOPPED. LOADED. READY.', subheadline: 'A little sauce. A lot to love.'},
-  'non-veg-pizza': {itemIds: ['mozza-italia-spl', 'chicken-valcano', 'south-chicken'], headline: 'LOADED WITH THE GOOD STUFF.', subheadline: 'Big flavour, baked into every slice.'},
-  'broasted-chicken': {itemIds: ['chicken-hot-wings', 'hot-crispy-fried-chicken'], headline: 'CRUNCH YOU CAN ALMOST HEAR.', subheadline: 'Crispy. Juicy. Gone fast.'},
-  burger: {itemIds: ['chicken-zinger-burger'], sizeIndex: 1, headline: 'STACKED FOR THE CRAVING.', subheadline: 'Big on crunch. Better with company.'},
-  'garlic-bread-slices': {itemIds: ['garlic-cheese-slices'], headline: 'ONE MORE CHEESY BITE.', subheadline: 'Pull apart. Bring everyone together.'},
-  'basmathi-ghee-pulav': {itemIds: ['basmathi-chicken-ghee-pulav', 'basmathi-veg-ghee-pulav', 'basmathi-egg-ghee-pulav'], headline: 'COMFORT IN EVERY SPOONFUL.', subheadline: 'Slow down. Dig in.'},
-  'chittimutyalu-ghee-pulav': {itemIds: ['chittimutyalu-chicken-ghee-pulav', 'chittimutyalu-veg-ghee-pulav', 'chittimutyalu-egg-ghee-pulav'], headline: 'FLAVOUR IN EVERY GRAIN.', subheadline: 'A warm, generous bowl made for sharing.'},
-  mojitos: {itemIds: ['classic-mint'], headline: 'A LITTLE SIP OF HAPPY.', subheadline: 'Cool, from the first sip.'},
-  'milk-shakes': {itemIds: ['shake-belgium-chocolate', 'shake-cold-coffee-shake'], headline: 'RICH. COLD. SERIOUSLY GOOD.', subheadline: 'A smooth finish for any craving.'},
-  desserts: {itemIds: ['sizzling-brownie-with-vanilla-ice-cream', 'chocolate-brownie'], headline: 'SAVE THE SWEETEST FOR LAST.', subheadline: 'There is always room for this.'},
-};
-
-export const menuShowcaseItemIds = [
-  'margarita',
-  'chicken-zinger-burger',
-  'chicken-hot-wings',
-  'basmathi-chicken-ghee-pulav',
-  'classic-mint',
-] as const;

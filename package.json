@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --hostname 127.0.0.1",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start --hostname 127.0.0.1",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
@@ -12,20 +12,19 @@
     "test:images": "node scripts/verify-menu-images.mjs"
   },
   "dependencies": {
+    "lucide-react": "^0.577.0",
     "next": "^16.2.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "motion": "^12.36.0",
-    "lucide-react": "^0.577.0"
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "typescript": "^5.9.0",
+    "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "tailwindcss": "^4.0.0",
-    "@tailwindcss/postcss": "^4.0.0",
     "eslint": "^9.0.0",
-    "eslint-config-next": "^16.2.0"
+    "eslint-config-next": "^16.2.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.9.0"
   }
 }

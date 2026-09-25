@@ -1,11 +1,32 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import {ArrowUpRight,MapPin,Phone,Star} from 'lucide-react';
-import {restaurant,callUrl,whatsappUrl} from '@/config/restaurant';
-import {foodVisuals} from '@/data/food-visuals';
-import {Reveal} from '@/components/ui/Motion';
-export function MenuPreview(){return <section className="section menu-preview"><Reveal className="section-heading"><div><span className="eyebrow">ONE MENU. SO MANY MOODS.</span><h2>WHAT’S YOUR<br/>KIND OF <span className="serif-accent">hungry?</span></h2></div><p>From a quick bite to a table full of favourites. There’s a flavour for every plan.</p></Reveal><div className="menu-preview-links">{[['01','Pizza','veg-pizza','From ₹200'],['02','Chicken','broasted-chicken','Wings, crispy & grilled'],['03','Burgers','burger','From ₹120'],['04','Ghee Pulav','basmathi-ghee-pulav','Regular, large & family'],['05','Drinks & Desserts','mojitos','A little something extra']].map(([n,title,id,note])=><Link href={`/menu#${id}`} key={id}><span>{n}</span><h3>{title}</h3><small>{note}</small><ArrowUpRight/></Link>)}</div></section>;}
-export function StorySection(){return <section className="section brand-story"><div className="story-logo"><Image src="/brand/mozza-italia.png" width={350} height={350} alt="Mozza Italia official logo"/><span className="eyebrow">TASTE BRINGS PEOPLE TOGETHER</span></div><Reveal><span className="eyebrow">THIS IS MOZZA ITALIA</span><h2>MORE THAN<br/>JUST <span className="serif-accent">food.</span></h2><p>Good food has a way of bringing people together. A shared pizza. One more bite. A conversation that goes on a little longer.</p><p>Pizza, crispy chicken, burgers and ghee pulav. Comfort-food favourites for every kind of craving, right here in Shadnagar.</p><Link href="/about" className="text-link">A little about us <ArrowUpRight/></Link></Reveal></section>;}
-export function ReviewsSection(){return <section className="section reviews" id="reviews"><div><span className="eyebrow">GOOD FOOD. REAL CONNECTIONS.</span><h2>A LITTLE LOVE<br/>FROM <span className="serif-accent">Shadnagar.</span></h2><p>Come for your favourites. Leave with a new one.</p></div><div className="rating"><strong>{restaurant.rating.toFixed(1)}<small>/ 5</small></strong><div aria-label={`${restaurant.rating} out of 5 stars`} className="stars">{[0,1,2,3,4].map(i=><Star key={i} size={19} fill={i<4?'currentColor':'none'}/>)}</div><span>Google Rating</span>{restaurant.reviewCount&&<span>{restaurant.reviewCount} reviews</span>}<div className="review-actions">{restaurant.reviewUrl?<a href={restaurant.reviewUrl} className="text-link" target="_blank" rel="noreferrer">Read Google reviews <ArrowUpRight size={15}/></a>:<button disabled title="Google review link awaiting confirmation">Read Google reviews</button>}{restaurant.writeReviewUrl?<a href={restaurant.writeReviewUrl} target="_blank" rel="noreferrer">Leave a review</a>:<button disabled title="Google review link awaiting confirmation">Leave a review</button>}</div></div></section>;}
-export function VisitSection(){return <section className="section visit"><div className="visit-art"><div className="visit-art-inner"><MapPin size={34} strokeWidth={1}/><span className="eyebrow">YOUR NEXT FOOD PLAN</span><h2>SEE YOU IN<br/>SHADNAGAR.</h2><span className="visit-coordinates">TELANGANA · INDIA</span><div className="visit-art-line"/></div></div><div className="visit-copy"><span className="eyebrow">PULL UP A CHAIR</span><h2>VISIT<br/>MOZZA ITALIA.</h2><p>{restaurant.address||`${restaurant.branch}, ${restaurant.region}`}</p><p className="visit-sub">{restaurant.hours||'Call our team for today’s hours and directions.'}</p><a href={callUrl} className="visit-phone"><Phone size={20}/>{restaurant.phone}</a><div className="visit-actions">{restaurant.googleMapsUrl?<a className="button red" href={restaurant.googleMapsUrl} target="_blank" rel="noreferrer">Get directions <ArrowUpRight size={18}/></a>:<a className="button red" href={whatsappUrl('Hi Mozza Italia, please share the Shadnagar outlet location and opening hours.')} target="_blank" rel="noreferrer">Ask for directions <ArrowUpRight size={18}/></a>}<Link className="text-link" href="/contact#reservation">Book a table <ArrowUpRight size={18}/></Link></div></div></section>;}
-export function AboutContent(){return <><StorySection/><section className="about-banner"><Image src={foodVisuals.pizza} fill sizes="100vw" alt="Illustrative pizza with cheese and basil"/><div><span className="eyebrow gold">A SLICE. A CRUNCH. A SPOONFUL.</span><h2>DIFFERENT CRAVINGS.<br/>ONE HAPPY TABLE.</h2><Link className="button red" href="/menu">Find your flavour <ArrowUpRight size={18}/></Link></div></section><VisitSection/></>;}
+import { ArrowRight, Heart, Utensils } from 'lucide-react';
+import { foodVisuals } from '@/data/food-visuals';
+
+export function StorySection() {
+  return <section className="content-section story-section">
+    <div className="story-image"><Image src={foodVisuals.burger} fill sizes="(max-width: 800px) 100vw, 48vw" alt="Illustrative crispy chicken burger" /></div>
+    <div className="story-copy"><span className="kicker">This is Mozza Italia</span><h2>Food tastes better when it brings people together.</h2><p>A shared pizza. One more bite. A conversation that runs a little longer. Mozza Italia is built around familiar favourites and the simple pleasure of eating them with your people.</p><p>From crispy chicken and stacked burgers to ghee pulav and something sweet, there is a dish for every kind of plan.</p><Link className="inline-link" href="/about">Our story <ArrowRight size={17} /></Link></div>
+  </section>;
+}
+
+export function PromotionalSection() {
+  return <section className="content-section promo-section">
+    <div className="promo-image"><Image src={foodVisuals.rice} fill sizes="(max-width: 800px) 100vw, 52vw" alt="Illustrative Mozza Italia chicken ghee pulav" /></div>
+    <div className="promo-copy"><span className="kicker">Made fresh for the moment</span><h2>Your favourites, ready when you are.</h2><p>Choose a location, find the dish that fits the mood, and prepare your order in a few simple steps.</p><Link className="button button-light" href="/menu">Explore the menu <ArrowRight size={18} /></Link></div>
+  </section>;
+}
+
+export function AboutContent() {
+  return <>
+    <section className="content-section about-intro">
+      <div><span className="about-icon"><Heart size={24} /></span><span className="kicker">Taste brings people together</span><h2>Comfort food for every kind of company.</h2></div>
+      <div><p>We believe a good meal does more than satisfy a craving. It gives people a reason to pause, share, laugh, and stay a little longer.</p><p>Mozza Italia brings together pizza, crispy chicken, burgers, salads, ghee pulav, drinks and desserts on one generous menu.</p></div>
+    </section>
+    <section className="content-section about-values">
+      <article><Utensils size={22} /><h3>Something for every mood</h3><p>Quick bites, complete meals, family portions and a sweet finish—all from the real menu.</p></article>
+      <article><Heart size={22} /><h3>Made for sharing</h3><p>A menu designed for solo cravings, family dinners and celebrations around a full table.</p></article>
+    </section>
+    <PromotionalSection />
+  </>;
+}

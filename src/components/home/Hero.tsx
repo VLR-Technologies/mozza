@@ -1,13 +1,31 @@
-'use client';
 import Image from 'next/image';
-import {useRef} from 'react';
-import {MagneticLink} from '@/components/ui/MagneticLink';
-import { ArrowDown, ArrowUpRight, MapPin } from 'lucide-react';
-import { motion, useMotionValue, useSpring, useReducedMotion, useScroll, useTransform } from 'motion/react';
+import { ArrowDown, Sparkles } from 'lucide-react';
 import { foodVisuals } from '@/data/food-visuals';
-import { whatsappUrl } from '@/config/restaurant';
+import { ServicePlanner } from './ServicePlanner';
+
 export function Hero() {
- const ref=useRef<HTMLElement>(null);const {scrollYProgress}=useScroll({target:ref,offset:['start start','end start']});const scale=useTransform(scrollYProgress,[0,1],[1,1.12]);const reduce=useReducedMotion();const x=useMotionValue(0),y=useMotionValue(0);const rx=useSpring(y,{stiffness:80,damping:20}),ry=useSpring(x,{stiffness:80,damping:20});
- return <section ref={ref} className="hero" onPointerMove={e=>{if(reduce||e.pointerType!=='mouse'||!window.matchMedia('(min-width:901px) and (pointer:fine)').matches)return;const box=e.currentTarget.getBoundingClientRect();x.set((e.clientX-box.left-box.width/2)/box.width*8);y.set(-(e.clientY-box.top-box.height/2)/box.height*8);}} onPointerLeave={()=>{x.set(0);y.set(0);}}><div className="hero-grain"/><div className="hero-topline"><span><MapPin size={13}/> SHADNAGAR, TELANGANA</span><span>GOOD FOOD. GOOD MOOD.</span></div><div className="hero-copy"><span className="eyebrow gold">A LITTLE ITALIAN. A LOT TO LOVE.</span><h1>TASTE BRINGS<br/><span className="hero-outline">PEOPLE</span><br/>TOGETHER<span className="red-dot">.</span></h1><p>Pizza. Crispy chicken. Burgers. Ghee pulav.<br/>Big flavours. Better company.</p><div className="hero-actions"><MagneticLink href="/menu" className="button red">Explore the menu <ArrowUpRight size={19}/></MagneticLink><a href={whatsappUrl()} className="text-link">Let’s order <ArrowUpRight size={19}/></a></div></div><motion.div className="hero-food" style={reduce?{}:{rotateX:rx,rotateY:ry,scale}}><div className="orbit orbit-one"/><div className="orbit orbit-two"/><div className="hero-food-image"><Image src={foodVisuals.pizza} fill sizes="(max-width: 700px) 100vw, 60vw" alt="Illustrative cheese pizza with colourful vegetables and fresh basil" priority/></div><div className="food-stamp"><span>FLAVOURS FOR</span><strong>EVERY<br/>MOOD</strong><span>MOZZA ITALIA</span></div><span className="food-note">a slice of the good life</span></motion.div><div className="hero-bottom"><span>01 / THE GOOD STUFF</span><a href="#signatures">SCROLL FOR YOUR NEXT CRAVING <ArrowDown size={15}/></a><span>MADE FOR SHARING</span></div></section>;
+  return <section className="home-hero" id="order">
+    <div className="hero-left">
+      <div className="hero-copy">
+        <span className="kicker"><Sparkles size={15} /> Mozza Italia · Made for sharing</span>
+        <h1>Good food.<br />Made for <em>your moment.</em></h1>
+        <p>Pizza, crispy chicken, burgers and comforting ghee pulav—ready for quick cravings and long tables alike.</p>
+        <a className="hero-scroll-link" href="#explore">Explore the menu <ArrowDown size={17} /></a>
+      </div>
+      <ServicePlanner />
+    </div>
+
+    <div className="hero-visual">
+      <Image
+        src={foodVisuals.pizza}
+        fill
+        loading="eager"
+        fetchPriority="high"
+        sizes="(max-width: 820px) 100vw, 48vw"
+        alt="Illustrative tomato, cheese and basil pizza"
+      />
+      <div className="hero-visual-note"><span>Freshly made</span><strong>For every kind of hungry</strong></div>
+    </div>
+
+  </section>;
 }
-export function FoodMarquee(){return <div className="marquee" aria-label="Pizza, crispy chicken, burgers, ghee pulav, good times"><div aria-hidden="true">{[0,1,2,3].map(n=><span key={n}>PIZZA <i>✳</i> CRISPY CHICKEN <i>✳</i> BURGERS <i>✳</i> GHEE PULAV <i>✳</i> GOOD TIMES <i>✳</i> </span>)}</div></div>;}

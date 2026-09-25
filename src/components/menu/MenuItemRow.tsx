@@ -1,7 +1,7 @@
 'use client';
 
 import {ArrowUpRight} from 'lucide-react';
-import {DietIcon} from '@/components/ui/Motion';
+import {DietIcon} from '@/components/ui/DietIcon';
 import {getMenuItemPhoto} from '@/data/menu-images';
 import {type MenuItem, formatPrice} from '@/data/menu-data';
 import {StaticMenuImage} from './StaticMenuImage';

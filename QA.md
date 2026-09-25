@@ -1,14 +1,33 @@
 # Validation record
 
-- `npm run lint`: passed, no errors or warnings.
+Validated locally on 25 September 2026.
+
+## Automated checks
+
+- `npm run lint`: passed with no errors or warnings.
 - `npm run typecheck`: passed.
-- `npm run build`: passed; all six public pages and the SEO endpoints prerendered successfully.
-- `node scripts/verify-menu.mjs`: passed; 25 categories, 118 entries and 189 variants, unique IDs, intentional null prices and source-page checks.
-- HTTP checks: homepage, menu, about, gallery, contact, privacy, robots, sitemap and original PDF all returned 200.
-- Browser: search, no-results state, vegetarian filter, burger size selection, correct WhatsApp draft, modal Escape/focus restoration, gallery category filter, arrow-key lightbox navigation, reservation draft creation and invalidation on edits tested.
-- No order, booking or message was sent during testing.
-- Runtime browser logs: no errors in tested flows.
-- Visual review performed at the available browser sizes (approximately 639 px and 1006 px), including hero, signature dishes, food story, menu controls, gallery, reservation and about page. No broken loaded images found.
-- Exact requested 1920, 1440, 1280, 1024, 768, 430, 390 and 360 px viewport checks are pending: automatic approval review rejected temporary browser resizing. Approval was requested in the task. These sizes must not be described as tested until that check is completed.
-- Reduced-motion CSS and pointer gating implemented; device-specific performance and reduced-motion emulation remain to be measured.
-- No Git repository, commit, push, remote repository or deployment created.
+- `npm run test:menu`: passed; 25 categories, 118 entries and 189 variants, including the four intentional manual-verification flags.
+- `npm run test:images`: passed; all 25 category mappings and all 118 item mappings resolve to existing, diet-safe imagery.
+- `npm run build`: passed with Next.js 16.3.6 using the documented `--webpack` build fallback. All public pages and SEO endpoints compiled successfully; `/menu` is request-rendered because it consumes search parameters.
+- `git diff --check`: passed.
+
+## Route checks
+
+The homepage, menu, about, gallery, contact, privacy, robots, sitemap and original menu PDF all returned HTTP 200 from the local development server.
+
+## Browser checks
+
+- Homepage service selector: Pickup, Reserve and Catering states render correctly.
+- Pickup: branch and query are carried to the menu route.
+- Menu: initial query, food-type filters, diet filters, category navigation, no-results reset, selected branch, item details and serving selection remain connected.
+- WhatsApp order URL includes the dish, serving and selected outlet. No message was sent.
+- Reservation and catering interfaces clearly prepare requests rather than claiming live availability or confirmed bookings.
+- Mobile navigation opens and closes correctly.
+- Mobile item detail opens as a bottom sheet with selected-outlet context.
+- Runtime review after the final image-loading update introduced no new browser warnings or errors.
+
+## Responsive checks
+
+Browser viewport validation completed at 375, 390, 430, 768, 1024, 1280 and 1440 px widths. The homepage and menu were visually reviewed across phone, tablet and desktop layouts. Automated document-width checks reported no horizontal page overflow at any requested width.
+
+The category and food-card rails intentionally scroll horizontally on small screens with their native scrollbar hidden.
