@@ -6,6 +6,8 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState, type MouseEvent } from 'react';
 import { ArrowRight, Menu, X } from 'lucide-react';
 
+import { useOrder } from '@/components/order/OrderProvider';
+
 type HomeSection = 'home' | 'locations' | 'catering';
 type NavigationItem = { label: string; href: string; section?: HomeSection };
 
@@ -18,6 +20,7 @@ const navigation: readonly NavigationItem[] = [
 ];
 
 export function GlassNavbar() {
+  const order = useOrder();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -115,7 +118,7 @@ export function GlassNavbar() {
       </nav>
       <div className="navbar-actions">
         <Link className="nav-reserve" href="/#reservation">Reserve</Link>
-        <Link className="button button-primary nav-order" href="/#order">Order now <ArrowRight size={17} /></Link>
+        <Link className="button button-primary nav-order" href="/#order" onClick={event => { if (order.count) { event.preventDefault(); order.open(); } }}>Order now{order.count > 0 && ` (${order.count})`} <ArrowRight size={17} /></Link>
         <button className="mobile-menu-trigger" type="button" aria-label={open ? 'Close navigation' : 'Open navigation'} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(value => !value)}>{open ? <X /> : <Menu />}</button>
       </div>
     </div>
@@ -128,7 +131,7 @@ export function GlassNavbar() {
       </nav>
       <div className="mobile-navigation-actions">
         <Link className="button button-secondary" href="/#reservation" onClick={() => setOpen(false)}>Reserve a table</Link>
-        <Link className="button button-primary" href="/#order" onClick={() => setOpen(false)}>Order now <ArrowRight size={17} /></Link>
+        <Link className="button button-primary" href="/#order" onClick={event => { setOpen(false); if (order.count) { event.preventDefault(); order.open(); } }}>Order now{order.count > 0 && ` (${order.count})`} <ArrowRight size={17} /></Link>
       </div>
     </div>
   </header>;

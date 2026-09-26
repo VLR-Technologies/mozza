@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test:menu": "node scripts/verify-menu.mjs",
-    "test:images": "node scripts/verify-menu-images.mjs"
+    "test:images": "node scripts/verify-menu-images.mjs",
+    "test:orders": "node --test scripts/order-tests.mjs",
+    "simulate:whatsapp": "node scripts/simulate-whatsapp.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.577.0",
