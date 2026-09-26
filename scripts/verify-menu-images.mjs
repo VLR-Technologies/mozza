@@ -46,9 +46,17 @@ for (const category of menu.menuCategories) {
   }
 }
 
-assert.equal(images.getMenuItemPhoto(menu.findItem('veg-burger')).src, visuals.foodVisuals.vegBurger);
-assert.equal(images.getMenuItemPhoto(menu.findItem('chicken-burger')).src, visuals.foodVisuals.burger);
+const itemIds = new Set(menu.menuItems.map(item => item.id));
+const itemPhotoIds = Object.keys(images.itemPhotoFiles);
+for (const id of itemPhotoIds) {
+  assert.ok(itemIds.has(id), `Item photo mapped to unknown menu item ${id}`);
+  assert.equal(images.getMenuItemPhoto(menu.findItem(id)).src, `/food/items/${images.itemPhotoFiles[id]}.webp`);
+}
+
+assert.equal(images.getMenuItemPhoto(menu.findItem('veg-burger')).src, '/food/items/veg-burger.webp');
+assert.equal(images.getMenuItemPhoto(menu.findItem('chicken-burger')).src, '/food/items/chicken-burger.webp');
+assert.equal(images.getMenuItemPhoto(menu.findItem('veg-burger-meal')).src, visuals.foodVisuals.vegBurger);
 assert.equal(images.getMenuItemPhoto(menu.findItem('veg-caesar-salad')).src, visuals.foodVisuals.salad);
 assert.equal(images.getMenuItemPhoto(menu.findItem('mayonnaise-southwest-sauce')).src, visuals.foodVisuals.dips);
 
-console.log('PASS: unchanged menu source, 25/25 category mappings, 118/118 item mappings, all image files present, and dietary-safe burger imagery.');
+console.log(`PASS: unchanged menu source, 25/25 category mappings, ${menu.menuItems.length}/${menu.menuItems.length} item mappings (${itemPhotoIds.length} dish-specific photos), all image files present, and dietary-safe burger imagery.`);
