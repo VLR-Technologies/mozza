@@ -3,7 +3,7 @@ import { ArrowRight, MapPin, MessageCircle } from 'lucide-react';
 import { branches, whatsappUrl } from '@/config/restaurant';
 
 export function LocationsSection() {
-  return <section className="content-section locations-section" id="locations">
+  return <section className="content-section locations-section" id="locations" data-nav-section="locations">
     <div className="section-heading"><div><span className="kicker">Four cities, one Mozza</span><h2>Find your nearest Mozza</h2><p>Choose your city, browse the menu, and let the team confirm current availability.</p></div></div>
     <div className="locations-grid">{branches.map(branch => <article className="location-card" id={`location-${branch.id}`} key={branch.id}>
       <span className="location-icon"><MapPin size={22} /></span>

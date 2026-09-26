@@ -37,7 +37,10 @@ export function ServicePlanner() {
     setReservationUrl(whatsappUrl(`Hello Mozza Italia,\nI would like to check table availability.\n\nPreferred outlet: ${selectedBranch.name}\nDate: ${date}\nTime: ${time} (IST)\nGuests: ${guests}\n\nPlease confirm availability.`));
   }
 
-  const cateringUrl = whatsappUrl(`Hello Mozza Italia,\nI am planning an event and would like to discuss catering.\n\nPreferred outlet: ${selectedBranch.name}\n\nPlease share the available catering options.`);
+  function openCateringEnquiry() {
+    window.history.pushState(null, '', '/#catering');
+    window.dispatchEvent(new Event('mozza:open-catering'));
+  }
 
   return <div className="service-planner" aria-label="Choose how you would like to visit Mozza Italia">
     <div className="service-tabs" role="tablist" aria-label="Dining options">
@@ -70,8 +73,7 @@ export function ServicePlanner() {
 
     {service === 'catering' && <div className="catering-quick" id="service-catering" role="tabpanel">
       <div><span className="kicker">Planning something bigger?</span><h2>Food for the whole table—and then some.</h2><p>Birthdays, office events, parties, celebrations and bulk orders. Tell us what you are planning and the team will take it from there.</p></div>
-      <label><span><MapPin size={17} /> Nearest location</span><select value={branch} onChange={event => setBranch(event.target.value)}>{branches.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
-      <a className="button button-primary" href={cateringUrl} target="_blank" rel="noreferrer">Plan catering <ArrowRight size={18} /></a>
+      <button className="button button-primary" type="button" onClick={openCateringEnquiry}>Plan catering <ArrowRight size={18} /></button>
     </div>}
   </div>;
 }

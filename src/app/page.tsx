@@ -7,7 +7,7 @@ import { CateringBanner } from '@/components/home/CateringBanner';
 import { ReservationSection } from '@/components/home/ReservationSection';
 
 export default function Home() {
-  return <>
+  return <div className="home-page">
     <Hero />
     <CuisineCategories />
     <PopularItems />
@@ -16,5 +16,5 @@ export default function Home() {
     <CateringBanner />
     <StorySection />
     <ReservationSection />
-  </>;
+  </div>;
 }
