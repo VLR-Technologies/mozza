@@ -80,12 +80,14 @@ export function GlassNavbar() {
 
   function followNavigation(event: MouseEvent<HTMLAnchorElement>, item: NavigationItem) {
     setOpen(false);
-    if (pathname !== '/' || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+    const section = item.section;
+    if (!section || pathname !== '/') return;
 
     event.preventDefault();
-    const section = item.section;
     const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
-    if (!section || section === 'home') {
+    if (section === 'home') {
       setHomeSection('home');
       window.history.pushState(null, '', '/');
       window.scrollTo({ top: 0, behavior });
