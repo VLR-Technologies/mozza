@@ -409,3 +409,29 @@ main { min-height: 60vh; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Ordering controls use the existing palette, modal and button system. */
+.order-dialog .modal-inner { max-width: 620px; width: 100%; padding: 32px; margin-left: auto; }
+.order-dialog h2 { margin: 12px 0 24px; font-family: var(--font-display); font-size: 34px; }
+.order-dialog label, .order-checkout label { display: grid; gap: 6px; margin: 14px 0; font-size: 13px; }
+.order-dialog input, .order-dialog select, .order-dialog textarea { width: 100%; min-width: 0; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--white); color: var(--ink); font: inherit; }
+.order-quantity { display: inline-flex; align-items: center; gap: 16px; margin: 12px 0; }
+.order-quantity button { width: 44px; height: 44px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-alt); color: var(--ink); font-size: 22px; }
+.order-quantity output { min-width: 20px; text-align: center; }
+.order-line { border-bottom: 1px solid var(--line); padding: 16px 0; }
+.order-line-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; justify-content: space-between; }
+.order-text-button { border: 0; background: transparent; color: var(--brand); text-decoration: underline; padding: 12px 0; min-height: 44px; }
+.order-total, .order-review-line { display: flex; justify-content: space-between; gap: 16px; margin: 18px 0; }
+.order-total strong { text-align: right; }
+.order-review-line small { display: block; color: var(--muted); }
+.order-dialog .button { margin-top: 12px; white-space: normal; text-align: center; }
+.order-dialog p, .order-dialog strong, .order-dialog span { overflow-wrap: anywhere; }
+.order-dialog button:disabled, .order-quantity button:disabled { opacity: .5; cursor: not-allowed; }
+.admin-orders { max-width: 1000px; margin: 120px auto 60px; padding: 24px; }
+.admin-orders article { border: 1px solid var(--line); border-radius: 16px; padding: 20px; margin: 16px 0; }
+.admin-orders input { padding: 12px; border: 1px solid var(--line); border-radius: 8px; }
+.admin-orders .button { margin: 4px; }
+@media (max-width: 600px) { .order-dialog { padding: 12px; } .order-dialog .modal-inner { padding: 28px 18px; } .order-total { flex-wrap: wrap; } }
+.mobile-order-cart { display: none; }
+@media (max-width: 1100px) { .mobile-order-cart { display: flex; position: fixed; z-index: 35; bottom: max(16px, env(safe-area-inset-bottom)); right: 16px; box-shadow: var(--shadow-md); } }
+.order-dialog .detail-footnote { font-size: 12px; }

@@ -3,7 +3,7 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, CalendarDays, Check, MapPin, Search, ShoppingBag, Users } from 'lucide-react';
-import { branches, whatsappUrl } from '@/config/restaurant';
+import { branches, whatsappUrl, whatsappIntentMessage } from '@/config/restaurant';
 
 type Service = 'pickup' | 'reserve' | 'catering';
 
@@ -34,7 +34,7 @@ export function ServicePlanner() {
 
   function requestTable(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setReservationUrl(whatsappUrl(`Hello Mozza Italia,\nI would like to check table availability.\n\nPreferred outlet: ${selectedBranch.name}\nDate: ${date}\nTime: ${time} (IST)\nGuests: ${guests}\n\nPlease confirm availability.`));
+    setReservationUrl(whatsappUrl(`${whatsappIntentMessage('reservation')}\n\nPreferred outlet: ${selectedBranch.name}\nDate: ${date}\nTime: ${time} (IST)\nGuests: ${guests}\n\nPlease confirm availability.`));
   }
 
   function openCateringEnquiry() {

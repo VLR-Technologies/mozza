@@ -4,6 +4,7 @@ export const restaurant = {
   address: null as string | null, googleMapsUrl: null as string | null,
   hours: null as string | null,
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || null,
+  features: { delivery: false, tableNumber: false },
   // TODO: confirm street address, hours, Maps links and production domain.
 };
 
@@ -35,3 +36,9 @@ export function whatsappUrl(message = 'Hi Mozza Italia, please share availabilit
 export function itemOrderUrl(name: string, size?: string, branch = restaurant.branch) {
   return whatsappUrl(`Hi Mozza Italia,\nI would like to order:\n\n${name}${size ? ` — ${size}` : ''}\nPreferred outlet: ${branch}\n\nPlease share availability / ordering details.`);
 }
+export function whatsappIntentMessage(intent: 'order' | 'reservation' | 'catering' | 'support' | 'location', detail?: string) {
+  const messages = { order: 'I want to place an order.', reservation: 'I want to book a table.', catering: 'I want to enquire about catering.', support: 'I want to talk to staff.', location: `Please share the ${detail || restaurant.branch} outlet location and opening hours.` };
+  return `Hi Mozza Italia 👋\n${messages[intent]}`;
+}
+
+export function whatsappIntentUrl(intent: 'order' | 'reservation' | 'catering' | 'support' | 'location', detail?: string) { return whatsappUrl(whatsappIntentMessage(intent, detail)); }

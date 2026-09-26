@@ -18,6 +18,7 @@ npm run lint
 npm run typecheck
 npm run test:menu
 npm run test:images
+npm run test:orders
 npm run build
 ```
 
@@ -55,4 +56,8 @@ The local food images are illustrative demo assets, not claims about the exact a
 
 ## Ordering and privacy
 
-The site prepares external WhatsApp messages and telephone links. It does not submit orders, process payments, expose live table availability, or confirm reservations. Reservation data is not stored in browser storage or sent to a server. No analytics or advertising trackers are installed.
+The site supports a persistent multi-item cart and checkout, with a structured WhatsApp fallback when credentials are absent. Supabase stores website drafts and operational orders; official Meta Cloud API enables a deterministic ordering/reservation bot once configured. No online payments or marketing campaigns are implemented.
+
+See [WhatsApp automation setup](docs/whatsapp-automation.md) for environment variables, Supabase migration, Meta onboarding and webhook verification, staff access, CLI simulation, security, limitations and production activation steps. The staff interface is `/admin/orders`.
+
+Run `npm run simulate:whatsapp` for a local bot session without sending messages. Cloud API is not live merely because the restaurant phone number is configured.

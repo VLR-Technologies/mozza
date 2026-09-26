@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { ArrowRight, ChevronUp } from 'lucide-react';
 import { foodVisuals } from '@/data/food-visuals';
-import { branches, whatsappUrl } from '@/config/restaurant';
+import { branches, whatsappUrl, whatsappIntentMessage } from '@/config/restaurant';
 
 const eventTypes = [
   'Birthday',
@@ -106,9 +106,8 @@ export function CateringBanner() {
 
     setError('');
     setRequest(whatsappUrl([
-      'Hello Mozza Italia,',
+      whatsappIntentMessage('catering'),
       '',
-      'I would like to enquire about catering for an event.',
       '',
       `Name: ${name}`,
       `Phone: ${phone}`,
