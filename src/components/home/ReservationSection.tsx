@@ -1,7 +1,7 @@
 'use client';
 import {useState,type FormEvent} from 'react';
 import {ArrowRight, CalendarDays} from 'lucide-react';
-import {branches,whatsappUrl} from '@/config/restaurant';
+import {branches,whatsappUrl,whatsappIntentMessage} from '@/config/restaurant';
 
 export function ReservationSection(){
  const [request,setRequest]=useState<string|null>(null);
@@ -19,13 +19,13 @@ export function ReservationSection(){
   if(!name||mobile.length<10||mobile.length>12){setError('Please enter your name and a valid mobile number.');return;}
   if(when.getTime()<=Date.now()){setError('Please choose a future date and time.');return;}
   setError('');
-  setRequest(whatsappUrl(`Hello Mozza Italia,\nI would like to reserve a table.\n\nPreferred outlet: ${branch}\nName: ${name}\nMobile: ${data.get('mobile')}\nDate: ${date}\nTime: ${time} (IST)\nGuests: ${data.get('guests')}\n${data.get('message')?`Message: ${data.get('message')}\n`:''}\nPlease confirm availability.`));
+  setRequest(whatsappUrl(`${whatsappIntentMessage('reservation')}\n\nPreferred outlet: ${branch}\nName: ${name}\nMobile: ${data.get('mobile')}\nDate: ${date}\nTime: ${time} (IST)\nGuests: ${data.get('guests')}\n${data.get('message')?`Message: ${data.get('message')}\n`:''}\nPlease confirm availability.`));
  }
 
  const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 
  return <section className="content-section reservation-section" id="reservation">
-  <div className="reservation-copy"><span className="reservation-icon"><CalendarDays size={24}/></span><span className="kicker">A table for your people</span><h2>Save a seat.<br/>Make a moment.</h2><p>Send a table request to your preferred Mozza Italia location. The restaurant team will confirm availability on WhatsApp.</p><div className="reservation-note"><strong>No fake availability.</strong><span>This form prepares a request—it does not confirm a booking or store your information.</span></div></div>
+  <div className="reservation-copy"><span className="reservation-icon"><CalendarDays size={24}/></span><span className="kicker">A table for your people</span><h2>Save a seat.<br/>Make a moment.</h2><p>Send a table request to your preferred Mozza Italia location. The restaurant team will confirm availability on WhatsApp.</p><div className="reservation-note"><strong>No fake availability.</strong><span>This form prepares a request—it does not confirm a booking. Details are shared when you continue to WhatsApp.</span></div></div>
   <form className="reservation-form" onSubmit={submit} onChange={()=>setRequest(null)}>
    <div className="form-grid">
     <label>Location<select name="branch" defaultValue="shadnagar">{branches.map(branch=><option key={branch.id} value={branch.id}>{branch.name}</option>)}</select></label>
