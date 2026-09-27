@@ -1,40 +1,44 @@
 import Image from 'next/image';
 import type {MenuPhoto} from '@/data/menu-images';
 
-// Shows the whole photo (no cropping). Photos come in tall, wide and square
-// shapes, so a blurred copy of the same photo fills the leftover space.
+// 'cover' fills a fixed-shape box (thumbnails, cards) and may trim the edges.
+// 'natural' keeps the photo's own shape, so the whole photo fills the frame.
 export function StaticMenuImage({
   photo,
   className = '',
   sizes,
   alt,
   loading,
+  fit = 'cover',
 }: {
   photo: MenuPhoto;
   className?: string;
   sizes: string;
   alt?: string;
   loading?: 'eager' | 'lazy';
+  fit?: 'cover' | 'natural';
 }) {
+  if (fit === 'natural') {
+    return <div className={`static-menu-image-natural ${className}`}>
+      <Image
+        src={photo.src}
+        alt={alt ?? photo.alt}
+        width={0}
+        height={0}
+        sizes={sizes}
+        loading={loading}
+      />
+    </div>;
+  }
+
   return <div className={`static-menu-image ${className}`}>
     <Image
-      className="static-menu-image-backdrop"
-      src={photo.src}
-      alt=""
-      aria-hidden
-      fill
-      sizes={sizes}
-      loading={loading}
-      style={{objectFit: 'cover', objectPosition: photo.position}}
-    />
-    <Image
-      className="static-menu-image-photo"
       src={photo.src}
       alt={alt ?? photo.alt}
       fill
       sizes={sizes}
       loading={loading}
-      style={{objectFit: 'contain'}}
+      style={{objectFit: 'cover', objectPosition: photo.position}}
     />
   </div>;
 }
