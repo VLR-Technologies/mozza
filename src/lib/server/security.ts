@@ -1,11 +1,12 @@
 import 'server-only';
+import { sessionAuthorized } from './admin-session';
 import { randomBytes, createHash, timingSafeEqual, createHmac } from 'node:crypto';
 export const publicId = (prefix = 'MI', now = new Date()) => `${prefix}-${new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now).replace(/-/g, '')}-${randomBytes(6).toString('hex').toUpperCase()}`;
 export const draftToken = () => `MI-DRAFT-${randomBytes(16).toString('hex').toUpperCase()}`;
 export const hash = (value: string) => createHash('sha256').update(value).digest('hex');
 export function constantEqual(a: string, b: string) { const x = Buffer.from(a), y = Buffer.from(b); return x.length === y.length && timingSafeEqual(x, y); }
 export function validSignature(raw: string, signature: string | null, secret: string) { return !!secret && !!signature && constantEqual(`sha256=${createHmac('sha256', secret).update(raw).digest('hex')}`, signature); }
-export function adminAuthorized(request: Request) { const secret = process.env.ADMIN_ORDER_SECRET; return !!secret && secret.length >= 32 && constantEqual(request.headers.get('authorization') || '', `Bearer ${secret}`); }
+export function adminAuthorized(request: Request) { const secret = process.env.ADMIN_ORDER_SECRET; return sessionAuthorized(request) || (!!secret && secret.length >= 32 && constantEqual(request.headers.get('authorization') || '', `Bearer ${secret}`)); }
 export function sameOrigin(request: Request) {
     const origin = request.headers.get('origin');
     if (!origin)

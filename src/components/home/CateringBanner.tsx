@@ -4,7 +4,8 @@ import Image from 'next/image';
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { ArrowRight, ChevronUp } from 'lucide-react';
 import { foodVisuals } from '@/data/food-visuals';
-import { branches, whatsappUrl, whatsappIntentMessage } from '@/config/restaurant';
+import { branches } from '@/config/restaurant';
+import { useWebsiteRequest } from '@/lib/use-website-request';
 
 const eventTypes = [
   'Birthday',
@@ -25,6 +26,7 @@ export function CateringBanner() {
   const [expanded, setExpanded] = useState(false);
   const [request, setRequest] = useState<string | null>(null);
   const [error, setError] = useState('');
+  const {save,saving}=useWebsiteRequest();
   const formPanel = useRef<HTMLDivElement>(null);
   const today = useMemo(() => new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit',
@@ -72,7 +74,7 @@ export function CateringBanner() {
     document.getElementById('catering')?.scrollIntoView({ block: 'start' });
   }
 
-  function prepareEnquiry(event: FormEvent<HTMLFormElement>) {
+  async function prepareEnquiry(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const name = String(data.get('name') || '').trim();
@@ -105,23 +107,11 @@ export function CateringBanner() {
     }
 
     setError('');
-    setRequest(whatsappUrl([
-      whatsappIntentMessage('catering'),
-      '',
-      '',
-      `Name: ${name}`,
-      `Phone: ${phone}`,
-      `Nearest outlet: ${outlet}`,
-      `Event type: ${eventType}`,
-      `Event date: ${eventDate}`,
-      `Preferred time: ${preferredTime ? `${preferredTime} (IST)` : 'Not specified'}`,
-      `Guests: ${guests}`,
-      `Service preference: ${service}`,
-      `Food preference: ${food}`,
-      `Notes: ${notes || 'None'}`,
-      '',
-      'Please let me know the available catering options.',
-    ].join('\n')));
+    try {
+      const saved=await save({kind:'enquiry',name,phone,branch:String(data.get('outlet')),eventType,eventDate,preferredTime,guestRange:guests,service,food,notes});
+      if(saved)setRequest(saved.whatsappUrl);
+    } catch(error){setError((error as Error).message);}
+
   }
 
   return <section className="content-section catering-section" id="catering" data-nav-section="catering">
@@ -141,7 +131,7 @@ export function CateringBanner() {
         <div><span className="kicker">Event enquiry</span><h2>Tell us about your event.</h2><p>Share the essentials and review your enquiry in WhatsApp. The restaurant team will confirm availability and options.</p></div>
         <button className="catering-form-close" type="button" onClick={closeForm}><ChevronUp size={18} /> Close form</button>
       </div>
-      <form className="catering-form" onSubmit={prepareEnquiry} onChange={() => { setRequest(null); setError(''); }}>
+      <form inert={saving} aria-busy={saving} className="catering-form" onSubmit={prepareEnquiry} onChange={() => { setRequest(null); setError(''); }}>
         <div className="catering-form-grid">
           <label htmlFor="catering-name">Name<input id="catering-name" name="name" required autoComplete="name" maxLength={80} placeholder="Your name" /></label>
           <label htmlFor="catering-phone">Phone number<input id="catering-phone" name="phone" type="tel" required autoComplete="tel" inputMode="tel" pattern="[+0-9 ()-]{10,18}" maxLength={18} placeholder="Your phone number" /></label>
@@ -156,9 +146,9 @@ export function CateringBanner() {
         </div>
         <p className="catering-form-hint">Delivery or venue service is an enquiry preference and is subject to restaurant confirmation.</p>
         {error && <p className="form-error" role="alert">{error}</p>}
-        <button className="button button-primary button-full" type="submit">Prepare catering enquiry <ArrowRight size={18} /></button>
-        {request && <div className="request-ready" role="status"><p>Your enquiry is ready. Review it in WhatsApp before choosing to send.</p><a className="button button-secondary" href={request} target="_blank" rel="noreferrer">Continue to WhatsApp <ArrowRight size={18} /></a></div>}
-        <p className="form-privacy">Your details stay in this form until you choose to open WhatsApp.</p>
+        <button className="button button-primary button-full" type="submit" disabled={saving}>{saving ? 'Saving enquiry…' : 'Prepare catering enquiry'} <ArrowRight size={18} /></button>
+        {request && <div className="request-ready" role="status"><p>Your enquiry has been saved for the team. You can continue in WhatsApp.</p><a className="button button-secondary" href={request} target="_blank" rel="noreferrer">Continue to WhatsApp <ArrowRight size={18} /></a></div>}
+        <p className="form-privacy">Submitting securely saves your event details for the restaurant to review. You choose whether to continue in WhatsApp.</p>
       </form>
     </div>}
   </section>;

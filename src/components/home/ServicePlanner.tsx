@@ -3,7 +3,8 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, CalendarDays, Check, MapPin, Search, ShoppingBag, Users } from 'lucide-react';
-import { branches, whatsappUrl, whatsappIntentMessage } from '@/config/restaurant';
+import { branches } from '@/config/restaurant';
+import { useWebsiteRequest } from '@/lib/use-website-request';
 
 type Service = 'pickup' | 'reserve' | 'catering';
 
@@ -22,7 +23,8 @@ export function ServicePlanner() {
   const [time, setTime] = useState('');
   const [guests, setGuests] = useState('2');
   const [reservationUrl, setReservationUrl] = useState<string | null>(null);
-  const selectedBranch = branches.find(item => item.id === branch) || branches[1];
+  const {save,saving}=useWebsiteRequest();
+  const [error,setError]=useState('');
   const today = useMemo(() => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()), []);
 
   function startPickup(event: FormEvent<HTMLFormElement>) {
@@ -32,9 +34,12 @@ export function ServicePlanner() {
     router.push(`/menu?${params.toString()}`);
   }
 
-  function requestTable(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setReservationUrl(whatsappUrl(`${whatsappIntentMessage('reservation')}\n\nPreferred outlet: ${selectedBranch.name}\nDate: ${date}\nTime: ${time} (IST)\nGuests: ${guests}\n\nPlease confirm availability.`));
+  async function requestTable(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();setError('');
+    try {
+      const saved=await save({kind:'reservation',form:'planner',branch,date,time,guests});
+      if(saved)setReservationUrl(saved.whatsappUrl);
+    } catch(error){setError((error as Error).message);}
   }
 
   function openCateringEnquiry() {
@@ -61,14 +66,15 @@ export function ServicePlanner() {
     </form>}
 
     {service === 'reserve' && <div id="service-reserve" role="tabpanel">
-      <form className="service-form reserve-form" onSubmit={requestTable} onChange={() => setReservationUrl(null)}>
+      <form inert={saving} aria-busy={saving} className="service-form reserve-form" onSubmit={requestTable} onChange={() => setReservationUrl(null)}>
         <label><span><MapPin size={17} /> Location</span><select value={branch} onChange={event => setBranch(event.target.value)}>{branches.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
         <label><span>Date</span><input type="date" required min={today} value={date} onChange={event => setDate(event.target.value)} /></label>
         <label><span>Time</span><input type="time" required value={time} onChange={event => setTime(event.target.value)} /></label>
         <label><span>Guests</span><select value={guests} onChange={event => setGuests(event.target.value)}>{Array.from({ length: 12 }, (_, index) => index + 1).map(count => <option key={count} value={count}>{count}</option>)}<option value="13+">13+</option></select></label>
-        <button className="button button-primary service-submit" type="submit">Find a table <ArrowRight size={18} /></button>
+        <button className="button button-primary service-submit" type="submit" disabled={saving}>{saving ? 'Saving request…' : 'Find a table'} <ArrowRight size={18} /></button>
       </form>
-      {reservationUrl && <div className="service-response" role="status"><p>Availability is confirmed personally by the restaurant—nothing has been booked yet.</p><a className="button button-secondary" href={reservationUrl} target="_blank" rel="noreferrer">Continue on WhatsApp <ArrowRight size={17} /></a></div>}
+      {error && <p className="form-error" role="alert">{error}</p>}
+      {reservationUrl && <div className="service-response" role="status"><p>Your request has been saved. Pending confirmation — the restaurant will confirm availability personally.</p><a className="button button-secondary" href={reservationUrl} target="_blank" rel="noreferrer">Continue on WhatsApp <ArrowRight size={17} /></a></div>}
     </div>}
 
     {service === 'catering' && <div className="catering-quick" id="service-catering" role="tabpanel">
