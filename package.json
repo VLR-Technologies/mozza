@@ -11,7 +11,9 @@
     "test:menu": "node scripts/verify-menu.mjs",
     "test:images": "node scripts/verify-menu-images.mjs",
     "test:orders": "node --test scripts/order-tests.mjs",
-    "simulate:whatsapp": "node scripts/simulate-whatsapp.mjs"
+    "simulate:whatsapp": "node scripts/simulate-whatsapp.mjs",
+    "test:admin": "node --test scripts/admin-tests.mjs",
+    "test:website": "node --test scripts/website-tests.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.577.0",

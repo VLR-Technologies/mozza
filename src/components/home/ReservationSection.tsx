@@ -1,13 +1,15 @@
 'use client';
 import {useState,type FormEvent} from 'react';
 import {ArrowRight, CalendarDays} from 'lucide-react';
-import {branches,whatsappUrl,whatsappIntentMessage} from '@/config/restaurant';
+import {branches} from '@/config/restaurant';
+import {useWebsiteRequest} from '@/lib/use-website-request';
 
 export function ReservationSection(){
  const [request,setRequest]=useState<string|null>(null);
  const [error,setError]=useState('');
+ const {save,saving}=useWebsiteRequest();
 
- function submit(e:FormEvent<HTMLFormElement>){
+ async function submit(e:FormEvent<HTMLFormElement>){
   e.preventDefault();
   const data=new FormData(e.currentTarget);
   const name=String(data.get('name')||'').trim();
@@ -15,18 +17,22 @@ export function ReservationSection(){
   const date=String(data.get('date'));
   const time=String(data.get('time'));
   const when=new Date(`${date}T${time}:00+05:30`);
-  const branch=branches.find(item=>item.id===data.get('branch'))?.name||'Shadnagar';
+
   if(!name||mobile.length<10||mobile.length>12){setError('Please enter your name and a valid mobile number.');return;}
   if(when.getTime()<=Date.now()){setError('Please choose a future date and time.');return;}
   setError('');
-  setRequest(whatsappUrl(`${whatsappIntentMessage('reservation')}\n\nPreferred outlet: ${branch}\nName: ${name}\nMobile: ${data.get('mobile')}\nDate: ${date}\nTime: ${time} (IST)\nGuests: ${data.get('guests')}\n${data.get('message')?`Message: ${data.get('message')}\n`:''}\nPlease confirm availability.`));
+  try {
+   const saved=await save({kind:'reservation',form:'full',name,phone:String(data.get('mobile')||''),branch:String(data.get('branch')),date,time,guests:String(data.get('guests')),notes:String(data.get('message')||'')});
+   if(saved)setRequest(saved.whatsappUrl);
+  } catch(error){setError((error as Error).message);}
+
  }
 
  const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 
  return <section className="content-section reservation-section" id="reservation">
-  <div className="reservation-copy"><span className="reservation-icon"><CalendarDays size={24}/></span><span className="kicker">A table for your people</span><h2>Save a seat.<br/>Make a moment.</h2><p>Send a table request to your preferred Mozza Italia location. The restaurant team will confirm availability on WhatsApp.</p><div className="reservation-note"><strong>No fake availability.</strong><span>This form prepares a request—it does not confirm a booking. Details are shared when you continue to WhatsApp.</span></div></div>
-  <form className="reservation-form" onSubmit={submit} onChange={()=>setRequest(null)}>
+  <div className="reservation-copy"><span className="reservation-icon"><CalendarDays size={24}/></span><span className="kicker">A table for your people</span><h2>Save a seat.<br/>Make a moment.</h2><p>Send a table request to your preferred Mozza Italia location. The restaurant team will confirm availability on WhatsApp.</p><div className="reservation-note"><strong>No fake availability.</strong><span>This form prepares a request—it does not confirm a booking. Submitting saves your request for the restaurant team.</span></div></div>
+  <form inert={saving} aria-busy={saving} className="reservation-form" onSubmit={submit} onChange={()=>setRequest(null)}>
    <div className="form-grid">
     <label>Location<select name="branch" defaultValue="shadnagar">{branches.map(branch=><option key={branch.id} value={branch.id}>{branch.name}</option>)}</select></label>
     <label>Your name<input name="name" required autoComplete="name" placeholder="Name" maxLength={80}/></label>
@@ -37,9 +43,9 @@ export function ReservationSection(){
     <label className="form-wide">Anything else? <span>(optional)</span><input name="message" placeholder="A celebration, a preference…" maxLength={500}/></label>
    </div>
    {error&&<p role="alert" className="form-error">{error}</p>}
-   <button className="button button-primary button-full" type="submit">Prepare table request <ArrowRight size={18}/></button>
-   {request&&<div className="request-ready" role="status"><p>Your request is ready. Review it in WhatsApp before choosing to send.</p><a className="button button-secondary" href={request} target="_blank" rel="noreferrer">Continue to WhatsApp <ArrowRight size={18}/></a></div>}
-   <p className="form-privacy">Your details stay in this form until you choose to open WhatsApp.</p>
+   <button className="button button-primary button-full" type="submit" disabled={saving}>{saving ? 'Saving request…' : 'Prepare table request'} <ArrowRight size={18}/></button>
+   {request&&<div className="request-ready" role="status"><p>Your request has been saved. Pending confirmation — you can continue in WhatsApp.</p><a className="button button-secondary" href={request} target="_blank" rel="noreferrer">Continue to WhatsApp <ArrowRight size={18}/></a></div>}
+   <p className="form-privacy">Submitting securely saves your details for the restaurant to review. A table is confirmed only by staff.</p>
   </form>
  </section>;
 }
