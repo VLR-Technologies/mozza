@@ -168,6 +168,20 @@ export const itemPhotoFiles: Record<string, string> = {
   'icecream-mango': 'icecream-mango',
   'icecream-belgium-chocolate': 'icecream-belgium-chocolate',
   'icecream-butter-scotch': 'icecream-butter-scotch',
+  'veg-burger-meal': 'veg-burger-meal',
+  'chicken-burger-meal': 'chicken-burger-meal',
+  'chicken-zinger-burger-meal': 'chicken-zinger-burger-meal',
+  'paneer-burger-meal': 'paneer-burger-meal',
+  'extra-patty': 'extra-patty',
+  'veg-cheese-burst': 'cheese-burst',
+  'nonveg-cheese-burst': 'cheese-burst',
+  'veg-extra-cheese': 'extra-cheese',
+  'nonveg-extra-cheese': 'extra-cheese',
+  paneer: 'paneer-topping',
+  'non-veg': 'non-veg-topping',
+  'mayonnaise-southwest-sauce': 'mayonnaise-southwest-sauce',
+  'mustard-sauce-chipotle-sauce': 'mustard-sauce-chipotle-sauce',
+  'soft-drinks-water-bottles': 'soft-drinks-water-bottles',
 };
 
 const categoryByItemId = new Map(
