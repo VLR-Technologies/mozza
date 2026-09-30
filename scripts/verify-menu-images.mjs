@@ -55,9 +55,10 @@ for (const id of itemPhotoIds) {
 
 assert.equal(images.getMenuItemPhoto(menu.findItem('veg-burger')).src, '/food/items/veg-burger.webp');
 assert.equal(images.getMenuItemPhoto(menu.findItem('chicken-burger')).src, '/food/items/chicken-burger.webp');
-assert.equal(images.getMenuItemPhoto(menu.findItem('veg-burger-meal')).src, visuals.foodVisuals.vegBurger);
+assert.equal(images.getMenuItemPhoto(menu.findItem('veg-burger-meal')).src, '/food/items/veg-burger-meal.webp');
 assert.equal(images.getMenuItemPhoto(menu.findItem('veg-caesar-salad')).src, '/food/items/veg-caesar-salad.webp');
 assert.equal(images.getMenuItemPhoto(menu.findItem('extra-basmathi-rice')).src, visuals.foodVisuals.vegRice);
-assert.equal(images.getMenuItemPhoto(menu.findItem('mayonnaise-southwest-sauce')).src, visuals.foodVisuals.dips);
+assert.equal(images.getMenuItemPhoto(menu.findItem('mayonnaise-southwest-sauce')).src, '/food/items/mayonnaise-southwest-sauce.webp');
+assert.equal(images.getMenuItemPhoto(menu.findItem('extra-chittimutyalu-rice')).src, visuals.foodVisuals.vegRice);
 
 console.log(`PASS: unchanged menu source, 25/25 category mappings, ${menu.menuItems.length}/${menu.menuItems.length} item mappings (${itemPhotoIds.length} dish-specific photos), all image files present, and dietary-safe burger imagery.`);
