@@ -182,6 +182,8 @@ export const itemPhotoFiles: Record<string, string> = {
   'mayonnaise-southwest-sauce': 'mayonnaise-southwest-sauce',
   'mustard-sauce-chipotle-sauce': 'mustard-sauce-chipotle-sauce',
   'soft-drinks-water-bottles': 'soft-drinks-water-bottles',
+  'extra-basmathi-rice': 'extra-basmathi-rice',
+  'extra-chittimutyalu-rice': 'chittimutyalu-veg-ghee-pulav',
 };
 
 const categoryByItemId = new Map(
