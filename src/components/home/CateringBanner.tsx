@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { ArrowRight, ChevronUp } from 'lucide-react';
 import { foodVisuals } from '@/data/food-visuals';
 import { branches } from '@/config/restaurant';
+import {useOrder} from '@/components/order/OrderProvider';
 import { useWebsiteRequest } from '@/lib/use-website-request';
 
 const eventTypes = [
@@ -23,8 +24,9 @@ const serviceOptions = ['Pickup', 'Delivery / Venue Service', 'Need Help Decidin
 const foodOptions = ['Vegetarian', 'Non-Vegetarian', 'Mixed', 'Not decided'];
 
 export function CateringBanner() {
+ const {cart,selectBranch}=useOrder();
   const [expanded, setExpanded] = useState(false);
-  const [request, setRequest] = useState<string | null>(null);
+  const [request, setRequest] = useState<{branch:string;url:string}|null>(null);
   const [error, setError] = useState('');
   const {save,saving}=useWebsiteRequest();
   const formPanel = useRef<HTMLDivElement>(null);
@@ -109,7 +111,7 @@ export function CateringBanner() {
     setError('');
     try {
       const saved=await save({kind:'enquiry',name,phone,branch:String(data.get('outlet')),eventType,eventDate,preferredTime,guestRange:guests,service,food,notes});
-      if(saved)setRequest(saved.whatsappUrl);
+      if(saved)setRequest({branch:cart.branch,url:saved.whatsappUrl});
     } catch(error){setError((error as Error).message);}
 
   }
@@ -135,7 +137,7 @@ export function CateringBanner() {
         <div className="catering-form-grid">
           <label htmlFor="catering-name">Name<input id="catering-name" name="name" required autoComplete="name" maxLength={80} placeholder="Your name" /></label>
           <label htmlFor="catering-phone">Phone number<input id="catering-phone" name="phone" type="tel" required autoComplete="tel" inputMode="tel" pattern="[+0-9 ()-]{10,18}" maxLength={18} placeholder="Your phone number" /></label>
-          <label htmlFor="catering-outlet">Nearest Mozza Italia location<select id="catering-outlet" name="outlet" required defaultValue="shadnagar">{branches.map(branch => <option key={branch.id} value={branch.id}>{branch.name}</option>)}</select></label>
+          <label htmlFor="catering-outlet">Nearest Mozza Italia location<select id="catering-outlet" name="outlet" required value={cart.branch} onChange={event=>selectBranch(event.target.value)}>{branches.map(branch => <option key={branch.id} value={branch.id}>{branch.name}</option>)}</select></label>
           <label htmlFor="catering-event-type">Event type<select id="catering-event-type" name="eventType" required defaultValue=""><option value="" disabled>Select event type</option>{eventTypes.map(type => <option key={type} value={type}>{type}</option>)}</select></label>
           <label htmlFor="catering-date">Event date<input id="catering-date" name="eventDate" type="date" min={today} required /></label>
           <label htmlFor="catering-time">Preferred time <span>(optional, IST)</span><input id="catering-time" name="preferredTime" type="time" /></label>
@@ -147,7 +149,7 @@ export function CateringBanner() {
         <p className="catering-form-hint">Delivery or venue service is an enquiry preference and is subject to restaurant confirmation.</p>
         {error && <p className="form-error" role="alert">{error}</p>}
         <button className="button button-primary button-full" type="submit" disabled={saving}>{saving ? 'Saving enquiry…' : 'Prepare catering enquiry'} <ArrowRight size={18} /></button>
-        {request && <div className="request-ready" role="status"><p>Your enquiry has been saved for the team. You can continue in WhatsApp.</p><a className="button button-secondary" href={request} target="_blank" rel="noreferrer">Continue to WhatsApp <ArrowRight size={18} /></a></div>}
+        {request?.branch===cart.branch && <div className="request-ready" role="status"><p>Your enquiry has been saved for the team. You can continue in WhatsApp.</p><a className="button button-secondary" href={request.url} target="_blank" rel="noreferrer">Continue to WhatsApp <ArrowRight size={18} /></a></div>}
         <p className="form-privacy">Submitting securely saves your event details for the restaurant to review. You choose whether to continue in WhatsApp.</p>
       </form>
     </div>}

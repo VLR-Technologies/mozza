@@ -2,10 +2,12 @@
 import {useState,type FormEvent} from 'react';
 import {ArrowRight, CalendarDays} from 'lucide-react';
 import {branches} from '@/config/restaurant';
+import {useOrder} from '@/components/order/OrderProvider';
 import {useWebsiteRequest} from '@/lib/use-website-request';
 
 export function ReservationSection(){
- const [request,setRequest]=useState<string|null>(null);
+ const {cart,selectBranch}=useOrder();
+ const [request,setRequest]=useState<{branch:string;url:string}|null>(null);
  const [error,setError]=useState('');
  const {save,saving}=useWebsiteRequest();
 
@@ -23,7 +25,7 @@ export function ReservationSection(){
   setError('');
   try {
    const saved=await save({kind:'reservation',form:'full',name,phone:String(data.get('mobile')||''),branch:String(data.get('branch')),date,time,guests:String(data.get('guests')),notes:String(data.get('message')||'')});
-   if(saved)setRequest(saved.whatsappUrl);
+   if(saved)setRequest({branch:cart.branch,url:saved.whatsappUrl});
   } catch(error){setError((error as Error).message);}
 
  }
@@ -34,7 +36,7 @@ export function ReservationSection(){
   <div className="reservation-copy"><span className="reservation-icon"><CalendarDays size={24}/></span><span className="kicker">A table for your people</span><h2>Save a seat.<br/>Make a moment.</h2><p>Send a table request to your preferred Mozza Italia location. The restaurant team will confirm availability on WhatsApp.</p><div className="reservation-note"><strong>No fake availability.</strong><span>This form prepares a request—it does not confirm a booking. Submitting saves your request for the restaurant team.</span></div></div>
   <form inert={saving} aria-busy={saving} className="reservation-form" onSubmit={submit} onChange={()=>setRequest(null)}>
    <div className="form-grid">
-    <label>Location<select name="branch" defaultValue="shadnagar">{branches.map(branch=><option key={branch.id} value={branch.id}>{branch.name}</option>)}</select></label>
+    <label>Location<select name="branch" value={cart.branch} onChange={event=>selectBranch(event.target.value)}>{branches.map(branch=><option key={branch.id} value={branch.id}>{branch.name}</option>)}</select></label>
     <label>Your name<input name="name" required autoComplete="name" placeholder="Name" maxLength={80}/></label>
     <label>Mobile number<input name="mobile" type="tel" required autoComplete="tel" placeholder="Your mobile number" pattern="[+0-9 ()-]{10,18}" maxLength={18}/></label>
     <label>Date<input type="date" name="date" min={today} required/></label>
@@ -44,7 +46,7 @@ export function ReservationSection(){
    </div>
    {error&&<p role="alert" className="form-error">{error}</p>}
    <button className="button button-primary button-full" type="submit" disabled={saving}>{saving ? 'Saving request…' : 'Prepare table request'} <ArrowRight size={18}/></button>
-   {request&&<div className="request-ready" role="status"><p>Your request has been saved. Pending confirmation — you can continue in WhatsApp.</p><a className="button button-secondary" href={request} target="_blank" rel="noreferrer">Continue to WhatsApp <ArrowRight size={18}/></a></div>}
+   {request?.branch===cart.branch&&<div className="request-ready" role="status"><p>Your request has been saved. Pending confirmation — you can continue in WhatsApp.</p><a className="button button-secondary" href={request.url} target="_blank" rel="noreferrer">Continue to WhatsApp <ArrowRight size={18}/></a></div>}
    <p className="form-privacy">Submitting securely saves your details for the restaurant to review. A table is confirmed only by staff.</p>
   </form>
  </section>;

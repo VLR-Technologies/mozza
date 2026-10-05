@@ -1,3 +1,5 @@
+'use client';
+import {useOrder} from '@/components/order/OrderProvider';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
@@ -5,7 +7,9 @@ import { DietIcon } from '@/components/ui/DietIcon';
 import { formatPrice, type MenuItem } from '@/data/menu-data';
 import { getMenuItemPhoto } from '@/data/menu-images';
 
-export function MenuItemCard({ item, branch = 'shadnagar' }: { item: MenuItem; branch?: string }) {
+export function MenuItemCard({ item, branch: selectedBranch }: { item: MenuItem; branch?: string }) {
+  const {cart}=useOrder();
+  const branch=selectedBranch||cart.branch;
   const photo = getMenuItemPhoto(item);
   const firstPrice = item.sizes.find(size => size.price !== null) || item.sizes[0];
 
