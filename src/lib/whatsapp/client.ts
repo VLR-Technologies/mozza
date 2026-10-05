@@ -1,4 +1,5 @@
 import 'server-only';
+import { LIVE_META_BRANCH, metaConfig } from '../server/config';
 import type { BotReply, Choice } from './types';
 export function withinServiceWindow(last: string | undefined, now = Date.now()) { const timestamp = last ? Date.parse(last) : NaN; return Number.isFinite(timestamp) && timestamp <= now && now - timestamp < 24 * 60 * 60 * 1000; }
 export function messagePayload(to: string, reply: BotReply) {
@@ -20,10 +21,10 @@ export function messagePayload(to: string, reply: BotReply) {
     return { ...base, type: 'interactive', interactive: { type: 'list', body: { text: reply.text }, action: { button: 'Choose', sections: [{ title: 'Mozza Italia', rows: reply.choices }] } } };
 }
 async function send(payload: unknown) {
-    const version = process.env.WHATSAPP_API_VERSION;
-    if (!/^v\d+\.\d+$/.test(version || '') || !process.env.WHATSAPP_ACCESS_TOKEN || !process.env.WHATSAPP_PHONE_NUMBER_ID)
+    const {apiVersion: version, accessToken, phoneNumberId} = metaConfig(LIVE_META_BRANCH);
+    if (!/^v\d+\.\d+$/.test(version || '') || !accessToken || !phoneNumberId)
         throw new Error('Cloud API is not configured');
-    const response = await fetch(`https://graph.facebook.com/${version}/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`, { method: 'POST', headers: { Authorization: `Bearer ${process.env.WHATSAPP_ACCESS_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: AbortSignal.timeout(12000) });
+    const response = await fetch(`https://graph.facebook.com/${version}/${phoneNumberId}/messages`, { method: 'POST', headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: AbortSignal.timeout(12000) });
     if (!response.ok)
         throw new Error(`WhatsApp delivery failed (${response.status})`);
     return response.json();

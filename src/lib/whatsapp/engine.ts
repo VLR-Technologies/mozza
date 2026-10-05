@@ -1,13 +1,13 @@
 import { menuCategories } from '../../data/menu-data';
-import { restaurant } from '../../config/restaurant';
+import { restaurant, resolveBranch } from '../../config/restaurant';
 import { addLine, cartText, changeQuantity, emptyCart, money, resolveLine, textField, validateCheckout } from '../order-utils';
 import type { BotReply, Choice, Reservation, Session, Transition } from './types';
 import type { Checkout } from '../../types/order';
-export const initialSession = (): Session => ({ state: 'WELCOME', cart: emptyCart(), source: 'whatsapp' });
+export const initialSession = (branch = 'shadnagar'): Session => ({ state: 'WELCOME', cart: emptyCart(branch), source: 'whatsapp' });
 const text = (text: string): BotReply => ({ kind: 'text', text });
 const buttons = (text: string, choices: Choice[]): BotReply => ({ kind: 'buttons', text, choices });
 const list = (text: string, choices: Choice[]): BotReply => ({ kind: 'list', text, choices });
-const welcome = () => buttons('Hi 👋 Welcome to Mozza Italia — Shadnagar. What can we help you with?\nFor catering, type catering.', [{ id: 'order', title: 'Order Food' }, { id: 'reserve', title: 'Book a Table' }, { id: 'staff', title: 'Talk to Staff' }]);
+const welcome = (branch: string) => buttons(`Hi 👋 Welcome to Mozza Italia — ${resolveBranch(branch).name}. What can we help you with?\nFor catering, type catering.`, [{ id: 'order', title: 'Order Food' }, { id: 'reserve', title: 'Book a Table' }, { id: 'staff', title: 'Talk to Staff' }]);
 const cartActions = () => list('What next?', [{ id: 'more', title: 'Add more' }, { id: 'cart', title: 'View cart' }, { id: 'edit', title: 'Edit / remove item' }, { id: 'checkout', title: 'Checkout' }, { id: 'cancel', title: 'Cancel order' }]);
 function pageList(title: string, entries: Choice[], page: number, prefix: string): BotReply {
     const safe = Math.max(0, Math.min(Number.isInteger(page) ? page : 0, Math.max(0, Math.ceil(entries.length / 8) - 1)));
@@ -48,7 +48,7 @@ export function parseTime(input: string) {
 }
 export function resumeDraft(session: Session, checkout: Checkout, token: string): Transition {
     const checked = validateCheckout(checkout);
-    return { session: { ...session, cart: { items: checked.items, branch: checked.branch }, checkout: checked, draftToken: token, source: 'website', state: 'ORDER_REVIEW' }, replies: [text('I found your order. Please review before confirming.'), text(`${cartText(checked)}\n\n${checked.fulfilment} · Shadnagar\nName: ${checked.customer.name}\nMobile: ${checked.customer.phone}${checked.customer.address ? `\nAddress: ${checked.customer.address}\nLandmark: ${checked.customer.landmark || '—'}` : ''}${checked.customer.notes ? `\nNote: ${checked.customer.notes}` : ''}\nPayment: ${checked.fulfilment === 'delivery' ? 'Confirm with restaurant' : 'Pay at restaurant'}`), reviewActions()] };
+    return { session: { ...session, cart: { items: checked.items, branch: checked.branch }, checkout: checked, draftToken: token, source: 'website', state: 'ORDER_REVIEW' }, replies: [text('I found your order. Please review before confirming.'), text(`${cartText(checked)}\n\n${checked.fulfilment} · ${resolveBranch(checked.branch).name}\nName: ${checked.customer.name}\nMobile: ${checked.customer.phone}${checked.customer.address ? `\nAddress: ${checked.customer.address}\nLandmark: ${checked.customer.landmark || '—'}` : ''}${checked.customer.notes ? `\nNote: ${checked.customer.notes}` : ''}\nPayment: ${checked.fulfilment === 'delivery' ? 'Confirm with restaurant' : 'Pay at restaurant'}`), reviewActions()] };
 }
 const reviewActions = () => buttons('Confirm this order request? Availability, final charges and timing are confirmed by staff.', [{ id: 'confirm', title: 'Confirm Order' }, { id: 'edit', title: 'Edit Order' }, { id: 'cancel', title: 'Cancel' }]);
 export function transition(previous: Session, input: string, phone: string, now = new Date()): Transition {
@@ -59,19 +59,19 @@ export function transition(previous: Session, input: string, phone: string, now 
     const done = (...replies: BotReply[]): Transition => ({ session, replies });
     try {
         if (command === 'reset')
-            return { session: { ...initialSession(), lastCustomerMessageAt: now.toISOString() }, replies: [welcome()] };
+            return { session: { ...initialSession(session.cart.branch), lastCustomerMessageAt: now.toISOString() }, replies: [welcome(session.cart.branch)] };
         if (session.state === 'HUMAN_HANDOFF')
             return done();
-        if ((/book a table/i.test(value) && /Preferred outlet:/i.test(value)) || (/enquire about catering/i.test(value) && /Event date:/i.test(value)) || command === 'staff' || /talk to staff|outlet location|opening hours|catering for an event|reserve a table\.[\s\S]*preferred outlet|check table availability\.[\s\S]*preferred outlet/i.test(value)) {
+        if ((/book a table/i.test(value) && /(?:Preferred )?outlet:/i.test(value)) || (/enquire about catering/i.test(value) && /Event date:/i.test(value)) || command === 'staff' || /talk to staff|outlet location|opening hours|catering for an event|reserve a table\.[\s\S]*preferred outlet|check table availability\.[\s\S]*preferred outlet/i.test(value)) {
             session.state = 'HUMAN_HANDOFF';
-            return { ...done(text(`Our team will help you here. You can also call ${restaurant.phone}. Automation is paused; send RESET to resume.`)), effect: { type: 'handoff', details: { request: value.slice(0, 3000) } } };
+            return { ...done(text(`Our team will help you here. You can also call ${resolveBranch(session.cart.branch).phone}. Automation is paused; send RESET to resume.`)), effect: { type: 'handoff', details: { branch: session.cart.branch, request: value.slice(0, 3000) } } };
         }
         if (command === 'cancel')
-            return { session: { ...initialSession(), lastCustomerMessageAt: now.toISOString() }, replies: [text('Your current request has been cleared. Existing submitted orders are unchanged; contact staff to cancel those.'), welcome()] };
+            return { session: { ...initialSession(session.cart.branch), lastCustomerMessageAt: now.toISOString() }, replies: [text('Your current request has been cleared. Existing submitted orders are unchanged; contact staff to cancel those.'), welcome(session.cart.branch)] };
         if (session.state === 'WELCOME' || session.state === 'ORDER_CREATED') {
             if (command === 'order' || /want to (?:place an )?order/i.test(value)) {
                 session.state = 'ORDER_CATEGORY';
-                session.cart = emptyCart();
+                session.cart = emptyCart(session.cart.branch);
                 delete session.checkout;
                 delete session.draftToken;
                 session.source = 'whatsapp';
@@ -79,15 +79,15 @@ export function transition(previous: Session, input: string, phone: string, now 
             }
             if (command === 'reserve' || /book (?:a )?table/i.test(value)) {
                 session.state = 'RESERVATION_DATE';
-                session.reservation = {};
+                session.reservation = { branch: session.cart.branch };
                 return done(text('What date? Use YYYY-MM-DD or e.g. 26 Sep. All reservations are requests until staff confirms.'));
             }
             if (/catering/i.test(value)) {
                 session.state = 'CATERING_NAME';
-                session.catering = {};
+                session.catering = { branch: session.cart.branch };
                 return done(text('What is your name?'));
             }
-            return done(welcome());
+            return done(welcome(session.cart.branch));
         }
         switch (session.state) {
             case 'ORDER_CATEGORY': {
@@ -144,7 +144,7 @@ export function transition(previous: Session, input: string, phone: string, now 
                     if (!session.cart.items.length)
                         throw new Error('Add an item before checkout.');
                     session.state = 'ORDER_FULFILMENT';
-                    return done(buttons('How would you like your order? Outlet: Shadnagar.', [{ id: 'pickup', title: 'Pickup' }, { id: 'dine-in', title: 'Dine-in' }, ...(restaurant.features.delivery ? [{ id: 'delivery', title: 'Delivery' }] : [])]));
+                    return done(buttons(`How would you like your order? Outlet: ${resolveBranch(session.cart.branch).name}.`, [{ id: 'pickup', title: 'Pickup' }, { id: 'dine-in', title: 'Dine-in' }, ...(restaurant.features.delivery ? [{ id: 'delivery', title: 'Delivery' }] : [])]));
                 }
                 return done(text(cartText(session.cart)), cartActions());
             }
@@ -183,7 +183,7 @@ export function transition(previous: Session, input: string, phone: string, now 
                 }
                 session.state = 'ORDER_REVIEW';
                 validateCheckout(session.checkout);
-                return done(text(`${cartText(session.cart)}\n\n${session.checkout!.fulfilment} · Shadnagar\nName: ${value}\nPayment: Pay at restaurant`), reviewActions());
+                return done(text(`${cartText(session.cart)}\n\n${session.checkout!.fulfilment} · ${resolveBranch(session.cart.branch).name}\nName: ${value}\nPayment: Pay at restaurant`), reviewActions());
             }
             case 'ORDER_ADDRESS':
                 session.checkout!.customer.address = textField(value, 'your address', 400, true);
@@ -221,7 +221,7 @@ export function transition(previous: Session, input: string, phone: string, now 
             case 'RESERVATION_NOTES':
                 session.reservation!.notes = command === 'skip' ? '' : textField(value, 'a note', 300);
                 session.state = 'RESERVATION_CONFIRM';
-                return done(buttons(`Table request · Shadnagar\n${session.reservation!.date} at ${session.reservation!.time} IST\n${session.reservation!.guests} guests\n${session.reservation!.name}\n${session.reservation!.notes}\nSubject to staff confirmation.`, [{ id: 'confirm', title: 'Confirm request' }, { id: 'cancel', title: 'Cancel' }]));
+                return done(buttons(`Table request · ${resolveBranch(session.cart.branch).name}\n${session.reservation!.date} at ${session.reservation!.time} IST\n${session.reservation!.guests} guests\n${session.reservation!.name}\n${session.reservation!.notes}\nSubject to staff confirmation.`, [{ id: 'confirm', title: 'Confirm request' }, { id: 'cancel', title: 'Cancel' }]));
             case 'RESERVATION_CONFIRM':
                 if (command === 'confirm') {
                     if (new Date(`${session.reservation!.date}T${session.reservation!.time}:00+05:30`).getTime() <= now.getTime())
@@ -251,8 +251,8 @@ export function transition(previous: Session, input: string, phone: string, now 
             case 'CATERING_NOTES':
                 session.catering!.notes = command === 'skip' ? '' : textField(value, 'a note', 300);
                 session.state = 'HUMAN_HANDOFF';
-                return { ...done(text(`Catering enquiry received. Our team will review it. Call ${restaurant.phone} if needed. Send RESET to resume automation.`)), effect: { type: 'handoff', details: session.catering! } };
-            default: return { session: initialSession(), replies: [text('Let’s start again. Your previous submitted requests are unchanged.'), welcome()] };
+                return { ...done(text(`Catering enquiry received. Our team will review it. Call ${resolveBranch(session.cart.branch).phone} if needed. Send RESET to resume automation.`)), effect: { type: 'handoff', details: session.catering! } };
+            default: return { session: initialSession(session.cart.branch), replies: [text('Let’s start again. Your previous submitted requests are unchanged.'), welcome(session.cart.branch)] };
         }
     }
     catch (e) {

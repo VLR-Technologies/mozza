@@ -435,3 +435,16 @@ main { min-height: 60vh; }
 .mobile-order-cart { display: none; }
 @media (max-width: 1100px) { .mobile-order-cart { display: flex; position: fixed; z-index: 35; bottom: max(16px, env(safe-area-inset-bottom)); right: 16px; box-shadow: var(--shadow-md); } }
 .order-dialog .detail-footnote { font-size: 12px; }
+
+/* Cart thumbnails reuse the menu's canonical photo and crop. */
+.order-line { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 16px; align-items: start; }
+.order-line-image { position: relative; width: 96px; height: 96px; overflow: hidden; border-radius: 12px; }
+.order-line-details { min-width: 0; }
+.order-line-details select { max-width: 100%; }
+.order-line-details label { margin: 8px 0; }
+.order-line .order-quantity { margin: 4px 0; gap: 12px; }
+.order-line-actions { gap: 8px; }
+@media (max-width: 600px) {
+  .order-line { grid-template-columns: 72px minmax(0, 1fr); gap: 12px; }
+  .order-line-image { width: 72px; height: 72px; }
+}
