@@ -548,8 +548,6 @@ main { min-height: 60vh; }
 .order-mode-note { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
 .order-mode-note span { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--white); color: var(--ink); font-size: 13px; font-weight: 700; }
 .order-hero-note .inline-link { color: #e1c17a; }
-.order-mode-muted { color: var(--muted); }
-.order-mode-muted a { color: var(--brand); font-weight: 700; border-bottom: 1px solid currentColor; }
 .order-hero-note { margin-top: 18px; font-size: 14px; }
 .order-hero-note .inline-link { font-size: 13px; }
 
