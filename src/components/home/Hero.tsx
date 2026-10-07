@@ -1,10 +1,9 @@
-import Image from 'next/image';
 import { ArrowDown } from 'lucide-react';
-import { foodVisuals } from '@/data/food-visuals';
 import { ServicePlanner } from './ServicePlanner';
+import { HeroFoodPath } from './HeroFoodPath';
 
 export function Hero() {
-  return <section className="home-hero" id="order" data-nav-section="home">
+  return <section className="home-hero">
     <div className="hero-left">
       <div className="hero-copy">
         <span className="kicker">Mozza Italia · Made for sharing</span>
@@ -15,15 +14,8 @@ export function Hero() {
       <ServicePlanner />
     </div>
 
-    <div className="hero-visual">
-      <Image
-        src={foodVisuals.pizza}
-        fill
-        loading="eager"
-        fetchPriority="high"
-        sizes="(max-width: 820px) 100vw, 48vw"
-        alt="Illustrative tomato, cheese and basil pizza"
-      />
+    <div className="hero-visual hero-visual-dishes">
+      <HeroFoodPath />
       <div className="hero-visual-note"><span>Freshly made</span><strong>For every kind of hungry</strong></div>
     </div>
 

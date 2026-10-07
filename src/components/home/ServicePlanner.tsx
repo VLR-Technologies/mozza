@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState, type FormEvent } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, CalendarDays, Check, MapPin, Search, ShoppingBag, Users } from 'lucide-react';
 import { branches } from '@/config/restaurant';
@@ -42,11 +43,6 @@ export function ServicePlanner() {
     } catch(error){setError((error as Error).message);}
   }
 
-  function openCateringEnquiry() {
-    window.history.pushState(null, '', '/#catering');
-    window.dispatchEvent(new Event('mozza:open-catering'));
-  }
-
   return <div className="service-planner" aria-label="Choose how you would like to visit Mozza Italia">
     <div className="service-tabs" role="tablist" aria-label="Dining options">
       {services.map(item => {
@@ -73,13 +69,14 @@ export function ServicePlanner() {
         <label><span>Guests</span><select value={guests} onChange={event => setGuests(event.target.value)}>{Array.from({ length: 12 }, (_, index) => index + 1).map(count => <option key={count} value={count}>{count}</option>)}<option value="13+">13+</option></select></label>
         <button className="button button-primary service-submit" type="submit" disabled={saving}>{saving ? 'Saving request…' : 'Find a table'} <ArrowRight size={18} /></button>
       </form>
+      <Link className="inline-link service-more" href="/reservation">Add your name and a special request <ArrowRight size={15} /></Link>
       {error && <p className="form-error" role="alert">{error}</p>}
       {reservationUrl && <div className="service-response" role="status"><p>Your request has been saved. Pending confirmation — the restaurant will confirm availability personally.</p><a className="button button-secondary" href={reservationUrl} target="_blank" rel="noreferrer">Continue on WhatsApp <ArrowRight size={17} /></a></div>}
     </div>}
 
     {service === 'catering' && <div className="catering-quick" id="service-catering" role="tabpanel">
       <div><span className="kicker">Planning something bigger?</span><h2>Food for the whole table—and then some.</h2><p>Birthdays, office events, parties, celebrations and bulk orders. Tell us what you are planning and the team will take it from there.</p></div>
-      <button className="button button-primary" type="button" onClick={openCateringEnquiry}>Plan catering <ArrowRight size={18} /></button>
+      <Link className="button button-primary" href="/catering">Plan catering <ArrowRight size={18} /></Link>
     </div>}
   </div>;
 }
