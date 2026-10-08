@@ -37,6 +37,19 @@ export function branchMapEmbedUrl(branch: Pick<Branch, 'mapQuery'>, zoom = 16) {
   return `https://maps.google.com/maps?q=${encodeURIComponent(branch.mapQuery)}&z=${zoom}&output=embed`;
 }
 
+// Street address for display. `address` stays null until the client confirms it
+// per outlet, but mapQuery already carries a client-supplied street address, so
+// the directory shows that rather than inventing one or leaving a blank card.
+export function branchAddress(branch: Branch) {
+  return branch.address || branch.mapQuery.replace(/^Mozza Italia,\s*/i, '');
+}
+
+// Directions link for an outlet. Falls back to a Maps search on the same query
+// the embedded map uses, so both always point at one place.
+export function branchDirectionsUrl(branch: Branch) {
+  return branch.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(branch.mapQuery)}`;
+}
+
 export const callUrl = `tel:+${restaurant.whatsapp}`;
 export function resolveBranch(value: string): Branch {
   const branch = branches.find(branch => branch.id === value || branch.name.toLowerCase() === value.toLowerCase());

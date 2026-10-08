@@ -32,3 +32,5 @@
 .mi-admin .ma-panel{min-width:0}
 .mi-admin .ma-sidebar{overflow-y:auto}
 @media(max-width:540px){.mi-admin .ma-top-item{grid-template-columns:minmax(0,1fr) 45px 85px;gap:8px;font-size:11px}.mi-admin .ma-analytics-filter label{flex:1;min-width:125px}.mi-admin .ma-analytics-filter p{width:100%;flex:auto}}
+.ma-brand img.ma-brand-logo{width:auto;height:40px;border-radius:8px;background:#fff;padding:3px 6px}
+.ma-login-logo{width:min(200px,70%);height:auto}
