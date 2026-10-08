@@ -34,7 +34,7 @@ export default function Contact() {
           <span className="feature-icon"><MessageCircle size={21} /></span>
           <h3>WhatsApp</h3>
           <p>Orders, timings and questions — the team replies on WhatsApp.</p>
-          <a className="inline-link" href={whatsappIntentUrl('support')} target="_blank" rel="noreferrer">Message the team <ArrowRight size={15} /></a>
+          <a className="inline-link" href={whatsappIntentUrl('support', 'shadnagar')} target="_blank" rel="noreferrer">Message the team <ArrowRight size={15} /></a>
         </article>
         <article className="feature-card">
           <span className="feature-icon"><MapPin size={21} /></span>
@@ -58,7 +58,7 @@ export default function Contact() {
           <span className="feature-icon"><Store size={21} /></span>
           <h3>Franchise enquiry</h3>
           <p>Interested in bringing Mozza Italia to your city? Start the conversation with the team.</p>
-          <a className="inline-link" href={whatsappUrl('Hi Mozza Italia 👋\nI am interested in a Mozza Italia franchise. Please share the details.\n\nMy city:')} target="_blank" rel="noreferrer">Enquire on WhatsApp <ArrowRight size={15} /></a>
+          <a className="inline-link" href={whatsappUrl('shadnagar', 'Hi Mozza Italia 👋\nI am interested in a Mozza Italia franchise. Please share the details.\n\nMy city:')} target="_blank" rel="noreferrer">Enquire on WhatsApp <ArrowRight size={15} /></a>
         </article>
       </div>
     </section>

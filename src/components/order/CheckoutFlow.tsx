@@ -1,13 +1,13 @@
 'use client';
 import { useRef, useState, type FormEvent } from 'react';
-import { branches, restaurant, whatsappUrl } from '@/config/restaurant';
+import { restaurant, resolveBranch, whatsappUrl } from '@/config/restaurant';
 import { money, orderBranches, orderMessage, validateCheckout } from '@/lib/order-utils';
 import type { Fulfilment, OrderSummary } from '@/types/order';
 import { useOrder } from './OrderProvider';
 export function CheckoutFlow({ onBack }: {
     onBack: () => void;
 }) {
-    const { cart, replace } = useOrder();
+    const { cart, selectBranch } = useOrder();
     const [fulfilment, setFulfilment] = useState<Fulfilment>('pickup');
     const [review, setReview] = useState<OrderSummary | null>(null);
     const [error, setError] = useState('');
@@ -21,7 +21,7 @@ export function CheckoutFlow({ onBack }: {
         e.preventDefault();
         const data = new FormData(e.currentTarget);
         try {
-            setReview(validateCheckout({ ...cart, branch: data.get('branch') || cart.branch, fulfilment, customer: { name: data.get('name'), phone: data.get('phone'), address: data.get('address') || undefined, landmark: data.get('landmark') || undefined, notes: data.get('notes') || undefined, table: data.get('table') || undefined } }));
+            setReview(validateCheckout({ ...cart, fulfilment, customer: { name: data.get('name'), phone: data.get('phone'), address: data.get('address') || undefined, landmark: data.get('landmark') || undefined, notes: data.get('notes') || undefined, table: data.get('table') || undefined } }));
             key.current = crypto.randomUUID();
             setError('');
         }
@@ -44,7 +44,7 @@ export function CheckoutFlow({ onBack }: {
             setResult({ url: data.whatsappUrl, note: data.note });
         }
         catch {
-            setResult({ url: whatsappUrl(orderMessage(review)), note: 'Online order storage is unavailable. Send this order request to the restaurant for confirmation; it has not been saved as an order.' });
+            setResult({ url: whatsappUrl(review.branch, orderMessage(review)), note: 'Online order storage is unavailable. Send this order request to the restaurant for confirmation; it has not been saved as an order.' });
         }
         finally {
             setBusy(false);
@@ -52,7 +52,7 @@ export function CheckoutFlow({ onBack }: {
     }
     if (review)
         return <div className="order-checkout">
-    <h3>Review your order</h3><p>Outlet: {branches.find(b => b.id === review.branch)?.name} · {review.fulfilment === 'delivery' ? 'Home delivery' : review.fulfilment}</p>
+    <h3>Review your order</h3><p>Outlet: {resolveBranch(review.branch).name} · {review.fulfilment === 'delivery' ? 'Home delivery' : review.fulfilment}</p>
     {review.lines.map(line => <div className="order-review-line" key={`${line.menuItemId}-${line.variant}`}><span>{line.quantity} × {line.name}<small>{line.size}</small></span><strong>{money(line.lineTotal)}</strong></div>)}
     <p className="order-total">Subtotal <strong>{money(review.subtotal)}</strong></p>
     <p>{review.customer.name}<br />+{review.customer.phone}</p>{review.customer.address && <p>Deliver to: {review.customer.address}{review.customer.landmark && <><br />Landmark: {review.customer.landmark}</>}</p>}{review.customer.notes && <p>{review.customer.notes}</p>}
@@ -63,8 +63,8 @@ export function CheckoutFlow({ onBack }: {
   </div>;
     return <form className="order-checkout" onSubmit={prepare}>
     <h3>How would you like your order?</h3><label>Order type<select value={fulfilment} onChange={e => setFulfilment(e.target.value as Fulfilment)}><option value="pickup">Pickup</option><option value="dine-in">Dine-in</option>{restaurant.features.delivery && <option value="delivery">Home delivery</option>}</select></label>
-    {/* Saved on the cart too, so the outlet is remembered if they go back. */}
-    <label>Outlet<select name="branch" value={cart.branch} onChange={e => replace({ ...cart, branch: e.target.value })}>{orderBranches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</select></label>
+    {/* Uses the cart's outlet switch, which asks first if changing outlet would clear the order. */}
+    <label>Outlet<select value={cart.branch} onChange={e => selectBranch(e.target.value)}>{orderBranches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</select></label>
     <label>Name<input name="name" required maxLength={80} autoComplete="name"/></label><label>Mobile<input name="phone" type="tel" required maxLength={20} autoComplete="tel" placeholder="+91"/></label>
     {fulfilment === 'delivery' && <><label>Home address<textarea name="address" required maxLength={400} rows={3} autoComplete="street-address" placeholder="House / flat no., street, area, city"/></label><label>Landmark (optional)<input name="landmark" maxLength={100} placeholder="Near…"/></label></>}
     {fulfilment === 'dine-in' && restaurant.features.tableNumber && <label>Table number<input name="table" maxLength={20}/></label>}

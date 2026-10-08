@@ -1,11 +1,10 @@
 import { menuCategories, menuItems } from '../data/menu-data';
-import { branches, restaurant } from '../config/restaurant';
+import { branches, restaurant, resolveBranch } from '../config/restaurant';
 import type { Cart, CartLine, Checkout, CustomerDetails, OrderSummary, PricedLine } from '../types/order';
 export const CART_KEY = 'mozza-order-cart-v1';
 export const MAX_LINES = 20;
-// Every outlet takes orders; they are all confirmed over the main WhatsApp line.
-export const orderBranches = branches;
-export const emptyCart = (): Cart => ({ items: [], branch: 'shadnagar' });
+export const orderBranches = branches.filter(b => b.whatsapp);
+export const emptyCart = (branch = 'shadnagar'): Cart => ({ items: [], branch: resolveBranch(branch).id });
 export const money = (value: number | null) => value === null ? 'Price confirmation required' : new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(value);
 export function normalizePhone(input: string) {
     let phone = input.replace(/[\s()+-]/g, '');
@@ -30,7 +29,7 @@ export function validateCart(value: unknown): Cart {
         throw new Error('Invalid cart.');
     const cart = value as Cart;
     if (!orderBranches.some(b => b.id === cart.branch))
-        throw new Error('Select an outlet for your order.');
+        throw new Error('Please select a valid Mozza Italia outlet.');
     if (!Array.isArray(cart.items) || cart.items.length > MAX_LINES)
         throw new Error('An order can contain up to 20 different servings.');
     const items: CartLine[] = [];
@@ -90,5 +89,5 @@ export function cartText(cart: Cart) {
     return lines.map((l, i) => `${i + 1}. ${l.name}\n   • ${l.size}\n   • Qty: ${l.quantity}\n   • ${money(l.lineTotal)}`).join('\n\n') + `\n\n*Subtotal:* ${money(subtotal)}`;
 }
 export function orderMessage(order: OrderSummary) {
-    return `Hi Mozza Italia 👋\n\nI'd like to place an order.\n\n*Order Summary*\n\n${cartText(order)}\n\n*Order Type:* ${order.fulfilment === 'delivery' ? 'Home delivery' : order.fulfilment}\n*Outlet:* ${branches.find(b => b.id === order.branch)!.name}\n\n*Customer*\nName: ${order.customer.name}\nMobile: ${order.customer.phone}${order.customer.address ? `\nHome address: ${order.customer.address}\nLandmark: ${order.customer.landmark || '—'}` : ''}${order.customer.table ? `\nTable: ${order.customer.table}` : ''}${order.customer.notes ? `\nNote: ${order.customer.notes}` : ''}\n\nPayment: ${order.fulfilment === 'delivery' ? 'Confirm with restaurant' : 'Pay at restaurant'}\nPlease confirm my order, final charges and expected preparation time.\nThank you.`;
+    return `Hi Mozza Italia 👋\n\nI'd like to place an order.\n\n*Order Summary*\n\n${cartText(order)}\n\n*Order Type:* ${{pickup:'Pickup','dine-in':'Dine-in',delivery:'Home delivery'}[order.fulfilment]}\nOutlet: ${resolveBranch(order.branch).name}\n\n*Customer*\nName: ${order.customer.name}\nMobile: ${order.customer.phone}${order.customer.address ? `\nHome address: ${order.customer.address}\nLandmark: ${order.customer.landmark || '—'}` : ''}${order.customer.table ? `\nTable: ${order.customer.table}` : ''}${order.customer.notes ? `\nNote: ${order.customer.notes}` : ''}\n\nPayment: ${order.fulfilment === 'delivery' ? 'Confirm with restaurant' : 'Pay at restaurant'}\nPlease confirm my order, final charges and expected preparation time.\nThank you.`;
 }

@@ -30,7 +30,7 @@ export default function LocationsPage() {
 
     <section className="content-section cta-band">
       <div><span className="kicker">Not sure which outlet?</span><h2>Message the team and we will point you to the nearest one.</h2></div>
-      <a className="button button-primary" href={whatsappIntentUrl('location')} target="_blank" rel="noreferrer"><MessageCircle size={17} /> Ask on WhatsApp</a>
+      <a className="button button-primary" href={whatsappIntentUrl('location', 'shadnagar')} target="_blank" rel="noreferrer"><MessageCircle size={17} /> Ask on WhatsApp</a>
     </section>
   </>;
 }

@@ -26,7 +26,7 @@ export default async function OrderPage({ searchParams }: { searchParams: Promis
         <span><UtensilsCrossed size={16} /> Dine-in</span>
         <span><Bike size={16} /> Home delivery</span>
       </div>
-      <p className="order-hero-note">Pick your outlet at checkout: {branches.map(branch => branch.name).join(', ')}. Every order is confirmed over WhatsApp — <Link className="inline-link" href="/locations">see all locations <ArrowRight size={15} /></Link></p>
+      <p className="order-hero-note">Pick your outlet at checkout: {branches.map(branch => branch.name).join(', ')}. Each outlet confirms your order on WhatsApp — <Link className="inline-link" href="/locations">see all locations <ArrowRight size={15} /></Link></p>
     </section>
 
     <MenuExplorer initialQuery={params.q} initialGroup={params.group} initialBranch={params.branch} initialItem={params.item} />

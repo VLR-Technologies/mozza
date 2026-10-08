@@ -1,9 +1,9 @@
-import { cloudReady, logEvent } from '@/lib/server/config';
+import { cloudReady, logEvent, LIVE_META_BRANCH, metaConfig } from '@/lib/server/config';
 import { constantEqual, privateJson, readBody, validSignature } from '@/lib/server/security';
 import { processIncoming } from '@/lib/whatsapp/processor';
 export const runtime = 'nodejs';
 export async function GET(request: Request) {
-    const params = new URL(request.url).searchParams, verify = process.env.WHATSAPP_VERIFY_TOKEN;
+    const params = new URL(request.url).searchParams, verify = metaConfig(LIVE_META_BRANCH).verifyToken;
     if (verify && params.get('hub.mode') === 'subscribe' && constantEqual(params.get('hub.verify_token') || '', verify))
         return new Response(params.get('hub.challenge') || '', { headers: { 'Cache-Control': 'no-store' } });
     return new Response('Forbidden', { status: 403 });
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     catch {
         return privateJson({ error: 'Invalid payload' }, 413);
     }
-    if (!validSignature(raw, request.headers.get('x-hub-signature-256'), process.env.WHATSAPP_APP_SECRET || ''))
+    if (!validSignature(raw, request.headers.get('x-hub-signature-256'), metaConfig(LIVE_META_BRANCH).appSecret || ''))
         return privateJson({ error: 'Forbidden' }, 403);
     if (!cloudReady())
         return privateJson({ error: 'Automation is not configured' }, 503);
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
                 continue;
             for (const change of entry.changes) {
                 const value = change.value;
-                if (change.field !== 'messages' || value?.metadata?.phone_number_id !== process.env.WHATSAPP_PHONE_NUMBER_ID)
+                if (change.field !== 'messages' || value?.metadata?.phone_number_id !== metaConfig(LIVE_META_BRANCH).phoneNumberId)
                     continue;
                 if (!Array.isArray(value.messages))
                     continue; // Delivery/read receipts are not customer messages.
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
                     if (time > Date.now() + 60000)
                         continue;
                     const input = message.type === 'text' ? message.text?.body : message.type === 'interactive' ? (message.interactive?.button_reply?.id || message.interactive?.list_reply?.id) : undefined;
-                    await processIncoming({ id: message.id, phone: message.from!, input: typeof input === 'string' ? input.slice(0, 10000) : 'unsupported-message', timestamp: new Date(time).toISOString() });
+                    await processIncoming({ branch: LIVE_META_BRANCH, id: message.id, phone: message.from!, input: typeof input === 'string' ? input.slice(0, 10000) : 'unsupported-message', timestamp: new Date(time).toISOString() });
                 }
             }
         }

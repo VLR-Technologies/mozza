@@ -1,0 +1,53 @@
+'use client';
+import {useState,type FormEvent} from 'react';
+import {ArrowRight, CalendarDays} from 'lucide-react';
+import {branches} from '@/config/restaurant';
+import {useOrder} from '@/components/order/OrderProvider';
+import {useWebsiteRequest} from '@/lib/use-website-request';
+
+export function ReservationSection(){
+ const {cart,selectBranch}=useOrder();
+ const [request,setRequest]=useState<{branch:string;url:string}|null>(null);
+ const [error,setError]=useState('');
+ const {save,saving}=useWebsiteRequest();
+
+ async function submit(e:FormEvent<HTMLFormElement>){
+  e.preventDefault();
+  const data=new FormData(e.currentTarget);
+  const name=String(data.get('name')||'').trim();
+  const mobile=String(data.get('mobile')||'').replace(/\D/g,'');
+  const date=String(data.get('date'));
+  const time=String(data.get('time'));
+  const when=new Date(`${date}T${time}:00+05:30`);
+
+  if(!name||mobile.length<10||mobile.length>12){setError('Please enter your name and a valid mobile number.');return;}
+  if(when.getTime()<=Date.now()){setError('Please choose a future date and time.');return;}
+  setError('');
+  try {
+   const saved=await save({kind:'reservation',form:'full',name,phone:String(data.get('mobile')||''),branch:String(data.get('branch')),date,time,guests:String(data.get('guests')),notes:String(data.get('message')||'')});
+   if(saved)setRequest({branch:cart.branch,url:saved.whatsappUrl});
+  } catch(error){setError((error as Error).message);}
+
+ }
+
+ const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+
+ return <section className="content-section reservation-section" id="reservation">
+  <div className="reservation-copy"><span className="reservation-icon"><CalendarDays size={24}/></span><span className="kicker">A table for your people</span><h2>Save a seat.<br/>Make a moment.</h2><p>Send a table request to your preferred Mozza Italia location. The restaurant team will confirm availability on WhatsApp.</p><div className="reservation-note"><strong>No fake availability.</strong><span>This form prepares a request—it does not confirm a booking. Submitting saves your request for the restaurant team.</span></div></div>
+  <form inert={saving} aria-busy={saving} className="reservation-form" onSubmit={submit} onChange={()=>setRequest(null)}>
+   <div className="form-grid">
+    <label>Location<select name="branch" value={cart.branch} onChange={event=>selectBranch(event.target.value)}>{branches.map(branch=><option key={branch.id} value={branch.id}>{branch.name}</option>)}</select></label>
+    <label>Your name<input name="name" required autoComplete="name" placeholder="Name" maxLength={80}/></label>
+    <label>Mobile number<input name="mobile" type="tel" required autoComplete="tel" placeholder="Your mobile number" pattern="[+0-9 ()-]{10,18}" maxLength={18}/></label>
+    <label>Date<input type="date" name="date" min={today} required/></label>
+    <label>Time (IST)<input type="time" name="time" required/></label>
+    <label>Guests<select name="guests" defaultValue="2">{[1,2,3,4,5,6,7,8,9,10,11,12].map(n=><option value={n} key={n}>{n} {n===1?'guest':'guests'}</option>)}<option value="13+">13+ guests</option></select></label>
+    <label className="form-wide">Anything else? <span>(optional)</span><input name="message" placeholder="A celebration, a preference…" maxLength={500}/></label>
+   </div>
+   {error&&<p role="alert" className="form-error">{error}</p>}
+   <button className="button button-primary button-full" type="submit" disabled={saving}>{saving ? 'Saving request…' : 'Prepare table request'} <ArrowRight size={18}/></button>
+   {request?.branch===cart.branch&&<div className="request-ready" role="status"><p>Your request has been saved. Pending confirmation — you can continue in WhatsApp.</p><a className="button button-secondary" href={request.url} target="_blank" rel="noreferrer">Continue to WhatsApp <ArrowRight size={18}/></a></div>}
+   <p className="form-privacy">Submitting securely saves your details for the restaurant to review. A table is confirmed only by staff.</p>
+  </form>
+ </section>;
+}

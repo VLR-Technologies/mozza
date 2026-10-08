@@ -15,6 +15,6 @@ export async function POST(request: Request) {
   if (stored.conflict) return privateJson({error:'This request has changed. Please review the form and submit again.'},409);
   if (stored.limited) return privateJson({error:'Too many requests. Please contact the restaurant directly or try again later.'},429);
   if (!stored.reference) throw new Error('Missing saved reference');
-  return privateJson({reference:stored.reference,status:input.kind==='reservation'?'pending':'new',whatsappUrl:serverWhatsappUrl(websiteRequestMessage(input,stored.reference))});
+  return privateJson({reference:stored.reference,status:input.kind==='reservation'?'pending':'new',whatsappUrl:serverWhatsappUrl(input.branch, websiteRequestMessage(input,stored.reference))});
  } catch { logEvent('website_request_save_failed',{kind:input.kind}); return privateJson({error:'We could not save your request. Please retry. No booking has been confirmed.'},503); }
 }

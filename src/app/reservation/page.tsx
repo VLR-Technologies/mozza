@@ -33,7 +33,7 @@ export default function ReservationPage() {
       <div className="feature-grid feature-grid-3">
         <article className="feature-card"><span className="feature-icon"><Clock size={21} /></span><h3>Opening hours</h3><p>{restaurant.hours || 'Hours vary by outlet. The team confirms the day’s timings when they reply to your request.'}</p></article>
         <article className="feature-card"><span className="feature-icon"><MessageCircle size={21} /></span><h3>How confirmation works</h3><p>Your request is saved for the restaurant with a reference. Staff reply on WhatsApp to confirm the table — it is not booked until they do.</p></article>
-        <article className="feature-card"><span className="feature-icon"><Phone size={21} /></span><h3>Prefer to call?</h3><p><a className="inline-link" href={callUrl}>{restaurant.phone}</a> reaches the main line, or <a className="inline-link" href={whatsappIntentUrl('reservation')} target="_blank" rel="noreferrer">message on WhatsApp</a>.</p></article>
+        <article className="feature-card"><span className="feature-icon"><Phone size={21} /></span><h3>Prefer to call?</h3><p><a className="inline-link" href={callUrl}>{restaurant.phone}</a> reaches the main line, or <a className="inline-link" href={whatsappIntentUrl('reservation', 'shadnagar')} target="_blank" rel="noreferrer">message on WhatsApp</a>.</p></article>
       </div>
     </section>
 
