@@ -5,7 +5,7 @@ export const restaurant = {
   address: null as string | null, googleMapsUrl: null as string | null,
   hours: null as string | null,
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || null,
-  features: { delivery: false, tableNumber: false },
+  features: { delivery: true, tableNumber: false },
   // TODO: confirm street address, hours, Maps links and production domain.
 };
 
