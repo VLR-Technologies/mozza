@@ -1,4 +1,7 @@
 'use client';
+import { resolveBranch } from '@/config/restaurant';
+import { getMenuItemPhoto } from '@/data/menu-images';
+import { StaticMenuImage } from '@/components/menu/StaticMenuImage';
 import { useState } from 'react';
 import Link from 'next/link';
 import { Modal } from '@/components/ui/Modal';
@@ -23,16 +26,16 @@ export function OrderDrawer({ onClose }: {
         setError((e as Error).message);
     } }
     return <Modal open onClose={onClose} title="Your order" className="order-dialog" sheet animated>
-    <span className="kicker">Mozza Italia · Shadnagar</span><h2>Your order</h2>
+    <span className="kicker">Mozza Italia · {resolveBranch(cart.branch).name}</span><h2>Your order</h2>
     {checkout && lines.length ? <CheckoutFlow onBack={() => setCheckout(false)}/> : <>
       {!lines.length && <p>Your order is empty. Choose something from the menu.</p>}
       {lines.map((line, index) => <article className="order-line" key={`${line.menuItemId}-${line.variant}`}>
-        <strong>{line.name}</strong><label>Serving<select aria-label={`Serving for ${line.name}`} value={line.variant} onChange={e => attempt(() => replace({ ...cart, items: cart.items.map((l, i) => i === index ? { ...l, variant: Number(e.target.value) } : l) }))}>{menuItems.find(i => i.id === line.menuItemId)!.sizes.map((size, i) => <option key={i} value={i}>{size.label}</option>)}</select></label>
-        <div className="order-line-actions"><QuantityControl value={line.quantity} label={`quantity for ${line.name}`} onChange={quantity => attempt(() => replace(changeQuantity(cart, index, quantity)))}/><strong>{money(line.lineTotal)}</strong><button className="order-text-button" onClick={() => replace({ ...cart, items: cart.items.filter((_, i) => i !== index) })}>Remove</button></div>
+        <StaticMenuImage photo={getMenuItemPhoto(menuItems.find(item => item.id === line.menuItemId)!)} className="order-line-image" sizes="(max-width: 600px) 72px, 96px"/><div className="order-line-details"><strong>{line.name}</strong><label>Serving<select aria-label={`Serving for ${line.name}`} value={line.variant} onChange={e => attempt(() => replace({ ...cart, items: cart.items.map((l, i) => i === index ? { ...l, variant: Number(e.target.value) } : l) }))}>{menuItems.find(i => i.id === line.menuItemId)!.sizes.map((size, i) => <option key={i} value={i}>{size.label}</option>)}</select></label>
+        <div className="order-line-actions"><QuantityControl value={line.quantity} label={`quantity for ${line.name}`} onChange={quantity => attempt(() => replace(changeQuantity(cart, index, quantity)))}/><strong>{money(line.lineTotal)}</strong><button className="order-text-button" onClick={() => replace({ ...cart, items: cart.items.filter((_, i) => i !== index) })}>Remove</button></div></div>
       </article>)}
       {error && <p role="alert" className="form-error">{error}</p>}
-      {!!lines.length && <><p className="order-total">Subtotal <strong>{money(subtotal)}</strong></p><p className="detail-footnote">Final charges and availability will be confirmed by the restaurant.</p><button className="button button-primary button-full" onClick={() => setCheckout(true)}>Checkout</button><button className="order-text-button" onClick={() => replace(emptyCart())}>Clear order</button></>}
-      <Link className="button button-secondary button-full" href="/menu?branch=shadnagar" onClick={onClose}>Add more items</Link>
+      {!!lines.length && <><p className="order-total">Subtotal <strong>{money(subtotal)}</strong></p><p className="detail-footnote">Final charges and availability will be confirmed by the restaurant.</p><button className="button button-primary button-full" onClick={() => setCheckout(true)}>Checkout</button><button className="order-text-button" onClick={() => replace(emptyCart(cart.branch))}>Clear order</button></>}
+      <Link className="button button-secondary button-full" href={`/menu?branch=${cart.branch}`} onClick={onClose}>Add more items</Link>
     </>}
   </Modal>;
 }

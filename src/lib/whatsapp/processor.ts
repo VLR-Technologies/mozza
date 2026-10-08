@@ -1,4 +1,6 @@
 import 'server-only';
+import { resolveBranch } from '../../config/restaurant';
+import { LIVE_META_BRANCH } from '../server/config';
 import { initialSession, resumeDraft, transition } from './engine';
 import { db, rpc } from '../server/db';
 import { publicId } from '../server/security';
@@ -11,6 +13,7 @@ export type Incoming = {
     phone: string;
     input: string;
     timestamp: string;
+    branch?: string;
 };
 export interface EventStore {
     seen(id: string): Promise<boolean>;
@@ -50,7 +53,8 @@ export async function processIncoming(incoming: Incoming, store: EventStore = ev
     }
     for (let attempt = 0; attempt < 4; attempt++) {
         const current = await store.session(incoming.phone);
-        const session = current?.state_payload || initialSession();
+        const branch = incoming.branch || LIVE_META_BRANCH;
+        const session = current?.state_payload || initialSession(branch);
         let result: Transition;
         const token = incoming.input.match(/MI-DRAFT-[A-F0-9]{32}/i)?.[0].toUpperCase();
         if (incoming.input === 'unsupported-message' && session.state !== 'HUMAN_HANDOFF') {
@@ -58,19 +62,22 @@ export async function processIncoming(incoming: Incoming, store: EventStore = ev
         }
         else if (token && session.state !== 'HUMAN_HANDOFF') {
             const checkout = await store.draft(token, incoming.phone);
-            if (checkout) {
+            if (checkout && checkout.branch !== branch) {
+                result = { session, replies: [{kind: 'text', text: `This draft belongs to ${resolveBranch(checkout.branch).name}. Please continue from the website using that outlet’s WhatsApp link.`}] };
+            }
+            else if (checkout) {
                 try {
                     result = resumeDraft(session, checkout, token);
                 }
                 catch {
-                    result = { session: initialSession(), replies: [{ kind: 'text', text: 'This draft contains a menu item that has changed. Send order to rebuild it, or STAFF for help.' }] };
+                    result = { session: initialSession(branch), replies: [{ kind: 'text', text: 'This draft contains a menu item that has changed. Send order to rebuild it, or STAFF for help.' }] };
                 }
             }
             else
                 result = { session, replies: [{ kind: 'text', text: 'This draft is expired, already submitted, or linked to a different mobile number. Use the WhatsApp number entered at checkout, create a fresh draft, or send STAFF for help.' }] };
         }
         else if (/\*Order Summary\*/i.test(incoming.input) && session.state !== 'HUMAN_HANDOFF') {
-            result = { session: { ...session, state: 'HUMAN_HANDOFF' }, replies: [{ kind: 'text', text: 'Your order enquiry is with our team for review. Send RESET to use automated ordering.' }], effect: { type: 'handoff', details: { request: incoming.input.slice(0, 6000) } } };
+            result = { session: { ...session, state: 'HUMAN_HANDOFF' }, replies: [{ kind: 'text', text: 'Your order enquiry is with our team for review. Send RESET to use automated ordering.' }], effect: { type: 'handoff', details: { branch: session.cart.branch, request: incoming.input.slice(0, 6000) } } };
         }
         else
             result = transition(session, incoming.input, incoming.phone);
@@ -80,19 +87,19 @@ export async function processIncoming(incoming: Incoming, store: EventStore = ev
             const checkout = validateCheckout({ ...result.effect.checkout, customer: { ...result.effect.checkout.customer, phone: incoming.phone } });
             const reference = publicId();
             effect = { ...result.effect, checkout, reference };
-            result.replies = [{ kind: 'text', text: `Order request received ✅\n\nOrder ID: *${reference}*\nOutlet: Mozza Italia — Shadnagar\nSubtotal: ${money(checkout.subtotal)}\nOur team will confirm availability, final charges and preparation / pickup timing shortly.` }, { kind: 'buttons', text: 'Need help?', choices: [{ id: 'staff', title: 'Talk to Staff' }] }];
+            result.replies = [{ kind: 'text', text: `Order request received ✅\n\nOrder ID: *${reference}*\nOutlet: Mozza Italia — ${resolveBranch(checkout.branch).name}\nSubtotal: ${money(checkout.subtotal)}\nOur team will confirm availability, final charges and preparation / pickup timing shortly.` }, { kind: 'buttons', text: 'Need help?', choices: [{ id: 'staff', title: 'Talk to Staff' }] }];
         }
         else if (result.effect?.type === 'reservation') {
             const reference = publicId('MR');
             effect = { ...result.effect, reference };
             const r = result.effect.reservation;
-            result.replies = [{ kind: 'text', text: `Reservation request received ✅\nReference: *${reference}*\n${r.date} at ${r.time} IST\nGuests: ${r.guests}\nOur team will confirm availability. Your table is not confirmed yet.` }];
+            result.replies = [{ kind: 'text', text: `Reservation request received ✅\nReference: *${reference}*\nOutlet: ${resolveBranch(r.branch || session.cart.branch).name}\n${r.date} at ${r.time} IST\nGuests: ${r.guests}\nOur team will confirm availability. Your table is not confirmed yet.` }];
         }
         const saved = await store.commit({ p_message_id: incoming.id, p_phone: incoming.phone, p_version: current?.version || 0, p_session: result.session, p_effect: effect, p_replies: splitReplies(result.replies), p_received_at: incoming.timestamp });
         if (saved.retry)
             continue;
         if (saved.draftInvalid) {
-            const recovery = await store.commit({ p_message_id: incoming.id, p_phone: incoming.phone, p_version: current?.version || 0, p_session: { ...initialSession(), lastCustomerMessageAt: incoming.timestamp }, p_effect: null, p_replies: [{ kind: 'text', text: 'Your draft expired or was already submitted. Send order to start again or STAFF to check an existing order.' }], p_received_at: incoming.timestamp });
+            const recovery = await store.commit({ p_message_id: incoming.id, p_phone: incoming.phone, p_version: current?.version || 0, p_session: { ...initialSession(branch), lastCustomerMessageAt: incoming.timestamp }, p_effect: null, p_replies: [{ kind: 'text', text: 'Your draft expired or was already submitted. Send order to start again or STAFF to check an existing order.' }], p_received_at: incoming.timestamp });
             if (recovery.retry)
                 continue;
         }

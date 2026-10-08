@@ -4,6 +4,7 @@ import { useMemo, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, CalendarDays, Check, MapPin, Search, ShoppingBag, Users } from 'lucide-react';
+import { useOrder } from '@/components/order/OrderProvider';
 import { branches } from '@/config/restaurant';
 import { useWebsiteRequest } from '@/lib/use-website-request';
 
@@ -18,12 +19,13 @@ const services = [
 export function ServicePlanner() {
   const router = useRouter();
   const [service, setService] = useState<Service>('pickup');
-  const [branch, setBranch] = useState('shadnagar');
+  const {cart,selectBranch:setBranch}=useOrder();
+  const branch=cart.branch;
   const [query, setQuery] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [guests, setGuests] = useState('2');
-  const [reservationUrl, setReservationUrl] = useState<string | null>(null);
+  const [reservationUrl, setReservationUrl] = useState<{branch:string;url:string} | null>(null);
   const {save,saving}=useWebsiteRequest();
   const [error,setError]=useState('');
   const today = useMemo(() => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()), []);
@@ -39,7 +41,7 @@ export function ServicePlanner() {
     event.preventDefault();setError('');
     try {
       const saved=await save({kind:'reservation',form:'planner',branch,date,time,guests});
-      if(saved)setReservationUrl(saved.whatsappUrl);
+      if(saved)setReservationUrl({branch,url:saved.whatsappUrl});
     } catch(error){setError((error as Error).message);}
   }
 
@@ -71,7 +73,7 @@ export function ServicePlanner() {
       </form>
       <Link className="inline-link service-more" href="/reservation">Add your name and a special request <ArrowRight size={15} /></Link>
       {error && <p className="form-error" role="alert">{error}</p>}
-      {reservationUrl && <div className="service-response" role="status"><p>Your request has been saved. Pending confirmation — the restaurant will confirm availability personally.</p><a className="button button-secondary" href={reservationUrl} target="_blank" rel="noreferrer">Continue on WhatsApp <ArrowRight size={17} /></a></div>}
+      {reservationUrl?.branch===branch && <div className="service-response" role="status"><p>Your request has been saved. Pending confirmation — the restaurant will confirm availability personally.</p><a className="button button-secondary" href={reservationUrl.url} target="_blank" rel="noreferrer">Continue on WhatsApp <ArrowRight size={17} /></a></div>}
     </div>}
 
     {service === 'catering' && <div className="catering-quick" id="service-catering" role="tabpanel">

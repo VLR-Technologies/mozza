@@ -1,6 +1,6 @@
 'use client';
 import { useRef, useState, type FormEvent } from 'react';
-import { restaurant, whatsappUrl } from '@/config/restaurant';
+import { restaurant, resolveBranch, whatsappUrl } from '@/config/restaurant';
 import { money, orderMessage, validateCheckout } from '@/lib/order-utils';
 import type { Fulfilment, OrderSummary } from '@/types/order';
 import { useOrder } from './OrderProvider';
@@ -44,7 +44,7 @@ export function CheckoutFlow({ onBack }: {
             setResult({ url: data.whatsappUrl, note: data.note });
         }
         catch {
-            setResult({ url: whatsappUrl(orderMessage(review)), note: 'Online order storage is unavailable. Send this order request to the restaurant for confirmation; it has not been saved as an order.' });
+            setResult({ url: whatsappUrl(review.branch, orderMessage(review)), note: 'Online order storage is unavailable. Send this order request to the restaurant for confirmation; it has not been saved as an order.' });
         }
         finally {
             setBusy(false);
@@ -52,7 +52,7 @@ export function CheckoutFlow({ onBack }: {
     }
     if (review)
         return <div className="order-checkout">
-    <h3>Review your order</h3><p>Outlet: Shadnagar · {review.fulfilment}</p>
+    <h3>Review your order</h3><p>Outlet: {resolveBranch(review.branch).name} · {review.fulfilment}</p>
     {review.lines.map(line => <div className="order-review-line" key={`${line.menuItemId}-${line.variant}`}><span>{line.quantity} × {line.name}<small>{line.size}</small></span><strong>{money(line.lineTotal)}</strong></div>)}
     <p className="order-total">Subtotal <strong>{money(review.subtotal)}</strong></p>
     <p>{review.customer.name}<br />+{review.customer.phone}</p>{review.customer.address && <p>{review.customer.address}<br />{review.customer.landmark}</p>}{review.customer.notes && <p>{review.customer.notes}</p>}
@@ -63,7 +63,7 @@ export function CheckoutFlow({ onBack }: {
   </div>;
     return <form className="order-checkout" onSubmit={prepare}>
     <h3>How would you like your order?</h3><label>Order type<select value={fulfilment} onChange={e => setFulfilment(e.target.value as Fulfilment)}><option value="pickup">Pickup</option><option value="dine-in">Dine-in</option>{restaurant.features.delivery && <option value="delivery">Delivery</option>}</select></label>
-    <p>Outlet: Shadnagar</p><label>Name<input name="name" required maxLength={80} autoComplete="name"/></label><label>Mobile<input name="phone" type="tel" required maxLength={20} autoComplete="tel" placeholder="+91"/></label>
+    <p>Outlet: {resolveBranch(cart.branch).name}</p><label>Name<input name="name" required maxLength={80} autoComplete="name"/></label><label>Mobile<input name="phone" type="tel" required maxLength={20} autoComplete="tel" placeholder="+91"/></label>
     {fulfilment === 'delivery' && <><label>Address<textarea name="address" required maxLength={400} autoComplete="street-address"/></label><label>Landmark<input name="landmark" maxLength={100}/></label></>}
     {fulfilment === 'dine-in' && restaurant.features.tableNumber && <label>Table number<input name="table" maxLength={20}/></label>}
     <label>Order note (optional)<input name="notes" maxLength={300}/></label><p className="detail-footnote">Your name, phone and order details are used to fulfil your request. No marketing opt-in. <a href="/privacy">Privacy details</a></p>
