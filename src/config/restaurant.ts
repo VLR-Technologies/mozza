@@ -17,17 +17,26 @@ export type Branch = {
   address: string | null;
   hours: string | null;
   googleMapsUrl: string | null;
+  // Google Maps search for this exact outlet (restaurant name + street address
+  // supplied by the client). Used by BranchMap for both the tile map and the
+  // maximized map, so the two views always show the same location.
+  mapQuery: string;
 };
 
 // City presence is confirmed by the client. Only Shadnagar currently has a
 // verified contact number in this project, so the other branches deliberately
 // omit address, hours, phone and directions instead of inventing them.
 export const branches: Branch[] = [
-  { id: 'hyderabad', name: 'Hyderabad', region: 'Telangana', phone: null, whatsapp: null, address: null, hours: null, googleMapsUrl: null },
-  { id: 'shadnagar', name: 'Shadnagar', region: 'Telangana', phone: restaurant.phone, whatsapp: restaurant.whatsapp, address: restaurant.address, hours: restaurant.hours, googleMapsUrl: restaurant.googleMapsUrl },
-  { id: 'jadcherla', name: 'Jadcherla', region: 'Telangana', phone: null, whatsapp: null, address: null, hours: null, googleMapsUrl: null },
-  { id: 'guntur', name: 'Guntur', region: 'Andhra Pradesh', phone: null, whatsapp: null, address: null, hours: null, googleMapsUrl: null },
+  { id: 'hyderabad', name: 'Hyderabad', region: 'Telangana', phone: null, whatsapp: null, address: null, hours: null, googleMapsUrl: null, mapQuery: 'Mozza Italia, Thukkuguda, Shamshabad, Telangana 501359' },
+  { id: 'shadnagar', name: 'Shadnagar', region: 'Telangana', phone: restaurant.phone, whatsapp: restaurant.whatsapp, address: restaurant.address, hours: restaurant.hours, googleMapsUrl: restaurant.googleMapsUrl, mapQuery: 'Mozza Italia, 1-11, Padmavati Colony, Shadnagar, Telangana 509216' },
+  { id: 'jadcherla', name: 'Jadcherla', region: 'Telangana', phone: null, whatsapp: null, address: null, hours: null, googleMapsUrl: null, mapQuery: 'Mozza Italia, Rd No 2, Plot No 5, Opp. New Bus Stand, Vijayanagar Colony, Jadcherla, Telangana 509301' },
+  { id: 'guntur', name: 'Guntur', region: 'Andhra Pradesh', phone: null, whatsapp: null, address: null, hours: null, googleMapsUrl: null, mapQuery: 'Mozza Italia, Hotel Siddhartha Building, 37-224, Brodipet, Guntur, Andhra Pradesh 522002' },
 ];
+
+// Keyless Google Maps embed for one outlet. Single source for tile + maximized map.
+export function branchMapEmbedUrl(branch: Pick<Branch, 'mapQuery'>, zoom = 16) {
+  return `https://maps.google.com/maps?q=${encodeURIComponent(branch.mapQuery)}&z=${zoom}&output=embed`;
+}
 
 export const callUrl = `tel:+${restaurant.whatsapp}`;
 export function whatsappUrl(message = 'Hi Mozza Italia, please share availability / ordering details.') {
