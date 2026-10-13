@@ -1,14 +1,11 @@
-import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import Image from 'next/image';
 import { ArrowRight, Briefcase, Cake, HeartHandshake, PartyPopper, Soup, Truck, Users } from 'lucide-react';
 import { foodVisuals } from '@/data/food-visuals';
 import { branches } from '@/config/restaurant';
 import { CateringEnquiryForm } from '@/components/catering/CateringEnquiryForm';
 
-export const metadata: Metadata = {
-  title: 'Catering',
-  description: 'Catering from Mozza Italia for corporate events, weddings, birthdays, private gatherings and bulk orders across Hyderabad, Shadnagar, Jadcherla and Guntur.',
-};
+export const metadata = pageMetadata('/catering');
 
 // Event types mirror the enquiry form's validated options so the page never
 // advertises something the form cannot submit.

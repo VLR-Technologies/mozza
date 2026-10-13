@@ -1,7 +1,7 @@
-import type {Metadata} from 'next';
+import { pageMetadata } from '@/lib/seo';
 import {MenuExplorer} from '@/components/menu/MenuExplorer';
 import {FoodDrift} from '@/components/menu/FoodDrift';
-export const metadata:Metadata={title:'The Menu',description:'Explore the complete Mozza Italia menu. Search pizza, chicken, burgers, rice, drinks and desserts with sizes and prices in rupees.'};
+export const metadata = pageMetadata('/menu');
 
 export default async function MenuPage({searchParams}:{searchParams:Promise<{q?:string;group?:string;branch?:string;item?:string}>}){
  const params=await searchParams;

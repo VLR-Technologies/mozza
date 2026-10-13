@@ -519,6 +519,14 @@ main { min-height: 60vh; }
 .location-pending { color: var(--muted); font-weight: 500; font-style: italic; }
 .location-panel-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: auto; padding-top: 4px; }
 .location-panel-actions .button { min-height: 44px; padding: 0 18px; font-size: 13px; }
+.outlet-breadcrumbs { margin-bottom: 22px; font-size: 13px; color: var(--muted); }
+.outlet-breadcrumbs ol { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.outlet-breadcrumbs li + li::before { content: '/'; margin-right: 8px; }
+.outlet-breadcrumbs a { text-decoration: underline; text-underline-offset: 3px; }
+.outlet-details h2 { margin: 0 0 12px; font-family: var(--font-display); font-size: 32px; line-height: 1.15; }
+.outlet-details .location-panel-body > div > p { color: var(--muted); font-size: 14px; }
+.outlet-details address { font-style: normal; overflow-wrap: anywhere; }
+.outlet-links { display: flex; flex-wrap: wrap; gap: 12px; }
 
 /* Shared feature cards (catering occasions, reservation notes) */
 .feature-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }

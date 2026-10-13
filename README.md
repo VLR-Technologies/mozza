@@ -19,7 +19,10 @@ npm run typecheck
 npm run test:menu
 npm run test:images
 npm run test:orders
-npm run build
+npm run test:website
+npm run test:admin
+npm run test:seo
+SEO_ENV=preview npm run build
 ```
 
 Node.js 20.9 or newer is required.
@@ -32,15 +35,28 @@ Node.js 20.9 or newer is required.
 - `/gallery`: illustrative food gallery with filters and an accessible lightbox.
 - `/contact`: branch discovery and table-request form.
 - `/privacy`: describes the actual local form and external WhatsApp behavior.
+- `/locations`: outlet directory linking to `/locations/hyderabad`,
+  `/locations/shadnagar`, `/locations/jadcherla` and `/locations/guntur`.
+- `/order`, `/reservation`, `/catering`: dedicated customer action pages.
 - `/robots.txt`, `/sitemap.xml`: domain-aware SEO endpoints.
 
 ## Business data
 
-- `src/config/restaurant.ts`: verified Shadnagar contact, branch list, optional addresses/hours/maps, production origin and WhatsApp URL builders.
+- `src/config/restaurant.ts`: four verified outlet contacts and street addresses,
+  optional hours/Maps listing URLs and existing WhatsApp URL builders.
 - Confirmed city presence: Hyderabad, Shadnagar, Jadcherla and Guntur.
-- Exact street addresses, hours and Maps links are not currently present. The UI omits those values and offers a WhatsApp outlet-details request instead of inventing them.
-- The only verified phone/WhatsApp number in the project is the Shadnagar contact. Requests for another selected outlet include that outlet name so the team can confirm the correct branch.
-- Set `NEXT_PUBLIC_SITE_URL` to a confirmed production URL when deployment is authorized. Without it, robots disallows indexing and the sitemap remains empty.
+- The owner confirmed all four map-query street addresses and ownership/routing
+  of `https://www.mozzaitalia.com` on 13 October 2026. Opening hours, coordinates,
+  exact Maps listing URLs and official social profiles remain unconfirmed.
+- Each outlet has its own verified phone/WhatsApp number. Existing branch
+  selection, cart confirmation and order handoff behavior is preserved.
+- Production requires `NEXT_PUBLIC_SITE_URL=https://www.mozzaitalia.com` at build
+  and runtime. Non-Vercel deployments also require `SEO_ENV=production`; Vercel
+  production is detected from `VERCEL_ENV`. Missing production configuration
+  fails early. Local/private builds explicitly use `SEO_ENV=preview`; local and
+  preview responses stay noindex even when the production URL is configured.
+- See [SEO audit, implementation and activation guide](docs/seo-upgrade.md) for
+  the route metadata table, tests, business confirmations and Search Console steps.
 
 ## Menu data
 

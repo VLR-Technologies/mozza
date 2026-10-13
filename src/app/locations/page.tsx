@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, MessageCircle, Phone } from 'lucide-react';
@@ -6,10 +6,7 @@ import { branches, callUrl, restaurant, whatsappIntentUrl } from '@/config/resta
 import { foodVisuals } from '@/data/food-visuals';
 import { LocationsDirectory } from '@/components/locations/LocationsDirectory';
 
-export const metadata: Metadata = {
-  title: 'Locations',
-  description: `Find Mozza Italia in ${branches.map(branch => branch.name).join(', ')}. Addresses, maps, directions and ordering for every outlet.`,
-};
+export const metadata = pageMetadata('/locations');
 
 export default function LocationsPage() {
   return <>

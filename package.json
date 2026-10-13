@@ -13,7 +13,9 @@
     "test:orders": "node --test scripts/order-tests.mjs",
     "simulate:whatsapp": "node scripts/simulate-whatsapp.mjs",
     "test:admin": "node --test scripts/admin-tests.mjs",
-    "test:website": "node --test scripts/website-tests.mjs"
+    "test:website": "node --test scripts/website-tests.mjs",
+    "test:seo": "node --test scripts/seo-tests.mjs",
+    "test:seo:live": "node --test scripts/seo-live-tests.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.577.0",
