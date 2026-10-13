@@ -1,0 +1,64 @@
+'use client';
+import { useState, type FormEvent } from 'react';
+import { ArrowRight, CalendarDays } from 'lucide-react';
+import { branches } from '@/config/restaurant';
+import { useWebsiteRequest } from '@/lib/use-website-request';
+
+// Prepares a table request: saves it for the restaurant, then offers a WhatsApp
+// handoff. It deliberately does not confirm a booking — staff do that.
+export function ReservationForm() {
+  const [request, setRequest] = useState<string | null>(null);
+  const [error, setError] = useState('');
+  const { save, saving } = useWebsiteRequest();
+
+  async function submit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const data = new FormData(e.currentTarget);
+    const name = String(data.get('name') || '').trim();
+    const mobile = String(data.get('mobile') || '').replace(/\D/g, '');
+    const date = String(data.get('date'));
+    const time = String(data.get('time'));
+    const when = new Date(`${date}T${time}:00+05:30`);
+
+    if (!name || mobile.length < 10 || mobile.length > 12) { setError('Please enter your name and a valid mobile number.'); return; }
+    if (when.getTime() <= Date.now()) { setError('Please choose a future date and time.'); return; }
+    // The request schema has no email column, so an optional email travels with
+    // the special request in notes and reaches staff in the WhatsApp summary.
+    const email = String(data.get('email') || '').trim();
+    const message = String(data.get('message') || '').trim();
+    const notes = [email && `Email: ${email}`, message].filter(Boolean).join('. ');
+    setError('');
+    try {
+      const saved = await save({ kind: 'reservation', form: 'full', name, phone: String(data.get('mobile') || ''), branch: String(data.get('branch')), date, time, guests: String(data.get('guests')), notes });
+      if (saved) setRequest(saved.whatsappUrl);
+    } catch (error) { setError((error as Error).message); }
+  }
+
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+
+  return <section className="content-section reservation-section" id="reservation">
+    <div className="reservation-copy">
+      <span className="reservation-icon"><CalendarDays size={24} /></span>
+      <span className="kicker">A table for your people</span>
+      <h2>Save a seat.<br />Make a moment.</h2>
+      <p>Send a table request to your preferred Mozza Italia location. The restaurant team will confirm availability on WhatsApp.</p>
+      <div className="reservation-note"><strong>No fake availability.</strong><span>This form prepares a request—it does not confirm a booking. Submitting saves your request for the restaurant team.</span></div>
+    </div>
+    <form inert={saving} aria-busy={saving} className="reservation-form" onSubmit={submit} onChange={() => setRequest(null)}>
+      <div className="form-grid">
+        <label>Location<select name="branch" defaultValue="shadnagar">{branches.map(branch => <option key={branch.id} value={branch.id}>{branch.name}</option>)}</select></label>
+        <label>Guests<select name="guests" defaultValue="2">{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(n => <option value={n} key={n}>{n} {n === 1 ? 'guest' : 'guests'}</option>)}<option value="13+">13+ guests</option></select></label>
+        <label>Date<input type="date" name="date" min={today} required /></label>
+        <label>Time (IST)<input type="time" name="time" required /></label>
+        <label>Your name<input name="name" required autoComplete="name" placeholder="Name" maxLength={80} /></label>
+        <label>Mobile number<input name="mobile" type="tel" required autoComplete="tel" placeholder="Your mobile number" pattern="[+0-9 \(\)\-]{10,18}" maxLength={18} /></label>
+        <label className="form-wide">Email <span>(optional)</span><input name="email" type="email" autoComplete="email" placeholder="you@example.com" maxLength={80} /></label>
+        <label className="form-wide">Special requests <span>(optional)</span><input name="message" placeholder="A celebration, a seating preference…" maxLength={500} /></label>
+      </div>
+      {error && <p role="alert" className="form-error">{error}</p>}
+      <button className="button button-primary button-full" type="submit" disabled={saving}>{saving ? 'Saving request…' : 'Request this table'} <ArrowRight size={18} /></button>
+      {request && <div className="request-ready" role="status"><p>Your request has been saved. Pending confirmation — you can continue in WhatsApp.</p><a className="button button-secondary" href={request} target="_blank" rel="noreferrer">Continue to WhatsApp <ArrowRight size={18} /></a></div>}
+      <p className="form-privacy">Submitting securely saves your details for the restaurant to review. A table is confirmed only by staff.</p>
+    </form>
+  </section>;
+}

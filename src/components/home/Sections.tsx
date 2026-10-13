@@ -6,7 +6,7 @@ import { foodVisuals } from '@/data/food-visuals';
 export function StorySection() {
   return <section className="content-section story-section">
     <div className="story-image"><Image src={foodVisuals.burger} fill sizes="(max-width: 800px) 100vw, 48vw" alt="Illustrative crispy chicken burger" /></div>
-    <div className="story-copy"><span className="kicker">This is Mozza Italia</span><h2>Food tastes better when it brings people together.</h2><p>A shared pizza. One more bite. A conversation that runs a little longer. Mozza Italia is built around familiar favourites and the simple pleasure of eating them with your people.</p><p>From crispy chicken and stacked burgers to ghee pulav and something sweet, there is a dish for every kind of plan.</p><Link className="inline-link" href="/about">Our story <ArrowRight size={17} /></Link></div>
+    <div className="story-copy"><span className="kicker">This is Mozza Italia</span><h2>Food tastes better together.</h2><p>Familiar favourites made for sharing — pizza, crispy chicken, burgers, ghee pulav and something sweet.</p><Link className="inline-link" href="/about">Our story <ArrowRight size={17} /></Link></div>
   </section>;
 }
 
@@ -19,9 +19,16 @@ export function PromotionalSection() {
 
 export function AboutContent() {
   return <>
+    {/* Chef from the logo on the left; heading and story text on the right. */}
     <section className="content-section about-intro">
-      <div><span className="about-icon"><Heart size={24} /></span><span className="kicker">Taste brings people together</span><h2>Comfort food for every kind of company.</h2></div>
-      <div><p>We believe a good meal does more than satisfy a craving. It gives people a reason to pause, share, laugh, and stay a little longer.</p><p>Mozza Italia brings together pizza, crispy chicken, burgers, salads, ghee pulav, drinks and desserts on one generous menu.</p></div>
+      <div className="about-chef"><Image src="/brand/mozza-chef-portrait.png" alt="The Mozza Italia chef" width={1020} height={1301} sizes="(max-width: 800px) 60vw, 30vw" /></div>
+      <div className="about-intro-copy">
+        <span className="kicker">Taste brings people together</span>
+        <h2>Comfort food for every kind of company.</h2>
+        <p>We believe a good meal does more than satisfy a craving. It gives people a reason to pause, share, laugh, and stay a little longer.</p>
+        <p>Mozza Italia brings together pizza, crispy chicken, burgers, salads, ghee pulav, drinks and desserts on one generous menu.</p>
+        <p>Every dish is cooked fresh in our kitchen, with recipes we have perfected over time and ingredients we pick with care. From fragrant ghee pulav to cheesy pizza, we keep the flavours honest, so every bite tastes just the way it should.</p>
+      </div>
     </section>
     <section className="content-section about-values">
       <article><Utensils size={22} /><h3>Something for every mood</h3><p>Quick bites, complete meals, family portions and a sweet finish—all from the real menu.</p></article>
