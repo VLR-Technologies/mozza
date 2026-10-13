@@ -18,7 +18,7 @@ export function LocationsDirectory() {
       <div className="location-panel-body">
         <div className="location-panel-head">
           <span className="location-icon"><MapPin size={20} /></span>
-          <div><h3>{branch.name}</h3><p>{branch.region}</p></div>
+          <div><h3><Link href={`/locations/${branch.id}`}>{branch.name}</Link></h3><p>{branch.region}</p></div>
         </div>
 
         <dl className="location-facts">
@@ -30,6 +30,7 @@ export function LocationsDirectory() {
         </dl>
 
         <div className="location-panel-actions">
+          <Link className="inline-link" href={`/locations/${branch.id}`}>Explore the {branch.name} outlet <ArrowRight size={16} /></Link>
           <Link className="button button-primary" href={`/order?branch=${branch.id}`}>Order from {branch.name} <ArrowRight size={17} /></Link>
           <a className="button button-secondary" href={branchDirectionsUrl(branch)} target="_blank" rel="noreferrer">Directions <ArrowRight size={16} /></a>
           <a className="inline-link" href={whatsappIntentUrl('location', branch.name)} target="_blank" rel="noreferrer"><MessageCircle size={15} /> Ask about this outlet</a>

@@ -1,13 +1,10 @@
-import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, CalendarDays, MapPin, MessageCircle, Phone, PartyPopper, Store } from 'lucide-react';
 import { branchAddress, branchDirectionsUrl, branches, callUrl, restaurant, whatsappIntentUrl, whatsappUrl } from '@/config/restaurant';
 
-export const metadata: Metadata = {
-  title: 'Contact',
-  description: 'Call or message Mozza Italia, find an outlet in Hyderabad, Shadnagar, Jadcherla or Guntur, or send a table or catering request.',
-};
+export const metadata = pageMetadata('/contact');
 
 // Contact is the hub that points to each standalone route; the full directory,
 // reservation and catering experiences live on their own pages.
@@ -23,6 +20,7 @@ export default function Contact() {
     </section>
 
     <section className="content-section">
+      <h2 className="sr-only">Contact and enquiry options</h2>
       <div className="feature-grid feature-grid-3">
         <article className="feature-card">
           <span className="feature-icon"><Phone size={21} /></span>
@@ -67,7 +65,7 @@ export default function Contact() {
       <div className="section-heading"><div><span className="kicker">Our outlets</span><h2>Find us in {branches.length} cities.</h2></div><Link className="inline-link" href="/locations">Maps &amp; details <ArrowRight size={17} /></Link></div>
       <div className="reservation-branches">{branches.map(branch => <article className="reservation-branch" key={branch.id}>
         <span className="location-icon"><MapPin size={18} /></span>
-        <div><h3>{branch.name}</h3><p>{branchAddress(branch)}</p></div>
+        <div><h3><Link href={`/locations/${branch.id}`}>{branch.name}</Link></h3><p>{branchAddress(branch)}</p></div>
         <a className="inline-link" href={branchDirectionsUrl(branch)} target="_blank" rel="noreferrer">Directions <ArrowRight size={15} /></a>
       </article>)}</div>
     </section>

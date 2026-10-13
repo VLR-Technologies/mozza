@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Clock, MapPin, MessageCircle, Phone } from 'lucide-react';
@@ -6,10 +6,7 @@ import { branchAddress, branches, callUrl, restaurant, whatsappIntentUrl } from 
 import { foodVisuals } from '@/data/food-visuals';
 import { ReservationForm } from '@/components/reservation/ReservationForm';
 
-export const metadata: Metadata = {
-  title: 'Reserve a table',
-  description: 'Request a table at Mozza Italia in Hyderabad, Shadnagar, Jadcherla or Guntur. Choose your date, time and guest count — the team confirms on WhatsApp.',
-};
+export const metadata = pageMetadata('/reservation');
 
 export default function ReservationPage() {
   return <>
@@ -42,7 +39,7 @@ export default function ReservationPage() {
       <div className="reservation-branches">{branches.map(branch => <article className="reservation-branch" key={branch.id}>
         <span className="location-icon"><MapPin size={18} /></span>
         <div><h3>{branch.name}</h3><p>{branchAddress(branch)}</p></div>
-        <Link className="inline-link" href={`/locations#location-${branch.id}`}>Map &amp; directions <ArrowRight size={15} /></Link>
+        <Link className="inline-link" href={`/locations/${branch.id}`}>Map &amp; directions <ArrowRight size={15} /></Link>
       </article>)}</div>
     </section>
   </>;

@@ -1,14 +1,11 @@
-import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import Link from 'next/link';
 import { ArrowRight, Bike, ShoppingBag, UtensilsCrossed } from 'lucide-react';
 import { branches } from '@/config/restaurant';
 import { MenuExplorer } from '@/components/menu/MenuExplorer';
 import { OrderScene } from '@/components/order/OrderScene';
 
-export const metadata: Metadata = {
-  title: 'Order online',
-  description: 'Build your Mozza Italia order — search the menu, pick a serving, add to your order and check out for pickup, dine-in or home delivery.',
-};
+export const metadata = pageMetadata('/order');
 
 export default async function OrderPage({ searchParams }: { searchParams: Promise<{ q?: string; group?: string; branch?: string; item?: string }> }) {
   const params = await searchParams;
