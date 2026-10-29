@@ -53,8 +53,8 @@ export function CheckoutFlow({ onBack }: {
     if (review)
         return <div className="order-checkout">
     <h3>Review your order</h3><p>Outlet: {resolveBranch(review.branch).name} · {review.fulfilment === 'delivery' ? 'Home delivery' : review.fulfilment}</p>
-    {review.lines.map(line => <div className="order-review-line" key={`${line.menuItemId}-${line.variant}`}><span>{line.quantity} × {line.name}<small>{line.size}</small></span><strong>{money(line.lineTotal)}</strong></div>)}
-    <p className="order-total">Subtotal <strong>{money(review.subtotal)}</strong></p>
+    {review.lines.map(line => <div className="order-review-line" key={`${line.menuItemId}-${line.variant}`}><span>{line.quantity} × {line.name}<small>{line.size}</small></span></div>)}
+    <p hidden>Subtotal <strong>{money(review.subtotal)}</strong></p>
     <p>{review.customer.name}<br />+{review.customer.phone}</p>{review.customer.address && <p>Deliver to: {review.customer.address}{review.customer.landmark && <><br />Landmark: {review.customer.landmark}</>}</p>}{review.customer.notes && <p>{review.customer.notes}</p>}
     <p className="detail-footnote">Payment: {review.fulfilment === 'delivery' ? 'Confirm with restaurant' : 'Pay at restaurant'}. Final charges, availability and timing require restaurant confirmation.</p>
     {error && <p role="alert" className="form-error">{error}</p>}
