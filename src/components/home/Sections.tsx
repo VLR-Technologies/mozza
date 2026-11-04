@@ -10,10 +10,10 @@ export function StorySection() {
   </section>;
 }
 
-export function PromotionalSection() {
+export function PromotionalSection({description = "Choose a location, find the dish that fits the mood, and prepare your order in a few simple steps."}: {description?: string} = {}) {
   return <section className="content-section promo-section">
     <div className="promo-image"><Image src={foodVisuals.rice} fill sizes="(max-width: 800px) 100vw, 52vw" alt="Illustrative Mozza Italia chicken ghee pulav" /></div>
-    <div className="promo-copy"><span className="kicker">Made fresh for the moment</span><h2>Your favourites, ready when you are.</h2><p>Choose a location, find the dish that fits the mood, and prepare your order in a few simple steps.</p><Link className="button button-light" href="/menu">Explore the menu <ArrowRight size={18} /></Link></div>
+    <div className="promo-copy"><span className="kicker">Made fresh for the moment</span><h2>Your favourites, ready when you are.</h2><p>{description}</p><Link className="button button-light" href="/menu">Explore the menu <ArrowRight size={18} /></Link></div>
   </section>;
 }
 
@@ -26,14 +26,16 @@ export function AboutContent() {
         <span className="kicker">Taste brings people together</span>
         <h2>Comfort food for every kind of company.</h2>
         <p>We believe a good meal does more than satisfy a craving. It gives people a reason to pause, share, laugh, and stay a little longer.</p>
-        <p>Mozza Italia brings together pizza, crispy chicken, burgers, salads, ghee pulav, drinks and desserts on one generous menu.</p>
-        <p>Every dish is cooked fresh in our kitchen, with recipes we have perfected over time and ingredients we pick with care. From fragrant ghee pulav to cheesy pizza, we keep the flavours honest, so every bite tastes just the way it should.</p>
+        <p>Our menu makes room for different appetites at the same table. Choose pizza and burgers, crispy chicken and snacks, or settle into a meal of rice and ghee pulav. Salads, drinks and desserts give everyone a way to make the meal their own.</p>
+        <p>Some visits are a quick bite between plans. Others are family meals, a catch-up with friends or a gathering that carries on over another helping. Mozza Italia is a place for those everyday moments, with familiar favourites and plenty to explore.</p>
+        <p>We care about the details that make a meal worth returning to: balanced flavours, thoughtful preparation and a consistent experience. Our focus is on food you enjoy eating and feel comfortable sharing with the people around you.</p>
+        <p>“Taste Brings People Together” is the idea at the heart of Mozza Italia. Whether you are choosing a favourite for yourself or ordering a spread for the table, we want the food to be part of time well spent together.</p>
       </div>
     </section>
     <section className="content-section about-values">
-      <article><Utensils size={22} /><h3>Something for every mood</h3><p>Quick bites, complete meals, family portions and a sweet finish—all from the real menu.</p></article>
-      <article><Heart size={22} /><h3>Made for sharing</h3><p>A menu designed for solo cravings, family dinners and celebrations around a full table.</p></article>
+      <article><Utensils size={22} /><h3>Something for every mood</h3><p>From a snack and a cool drink to pizza, chicken or ghee pulav, there is room for different cravings. Round out the meal with a dessert, or come back to a familiar favourite.</p></article>
+      <article><Heart size={22} /><h3>Made for sharing</h3><p>Pick a few dishes for the middle of the table, pass around the sides and let everyone find something they enjoy. Our variety makes it easy to bring different tastes together over one meal.</p></article>
     </section>
-    <PromotionalSection />
+    <PromotionalSection description="A quick lunch, a relaxed dinner or a meal to share: start with the outlet that suits your plans. Browse the menu, choose your favourites and put together an order for your kind of gathering." />
   </>;
 }
