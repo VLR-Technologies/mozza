@@ -4,6 +4,7 @@ import {ArrowUpRight} from 'lucide-react';
 import {DietIcon} from '@/components/ui/DietIcon';
 import {getMenuItemPhoto} from '@/data/menu-images';
 import {type MenuItem} from '@/data/menu-data';
+import {menuCardDescriptions} from '@/data/menu-card-descriptions';
 import {StaticMenuImage} from './StaticMenuImage';
 
 export function MenuDietMarker({item}: {item: MenuItem}) {
@@ -30,7 +31,7 @@ export function MenuItemRow({item, onSelect}: {item: MenuItem; onSelect: () => v
     />
     <div className="menu-row-copy">
       <div className="menu-name"><MenuDietMarker item={item}/><h3>{item.name}</h3></div>
-      {item.description && <p>{item.description}</p>}
+      <p>{menuCardDescriptions[item.id]}</p>
       {item.note && <small>{item.note}</small>}
       <span className="row-order-label">View & order <ArrowUpRight size={12}/></span>
     </div>

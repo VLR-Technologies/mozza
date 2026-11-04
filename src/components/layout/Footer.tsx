@@ -21,5 +21,6 @@ export function Footer() {
       <div className="footer-column footer-contact"><h2>Support</h2><a href={`tel:+${branch.whatsapp}`}><Phone size={16} /> {branch.phone}</a><a href={whatsappIntentUrl('support',branch.id)} target="_blank" rel="noreferrer"><MessageCircle size={16} /> WhatsApp <ArrowUpRight size={14} /></a><Link href="/contact">Contact</Link></div>
     </div>
     <div className="footer-bottom"><span>© {new Date().getFullYear()} Mozza Italia</span><span>Food visuals are illustrative. Actual presentation may vary.</span><Link href="/privacy">Privacy</Link></div>
+    <p className="footer-credit">Powered by <a href="https://vlrtechnologies.net" target="_blank" rel="noopener noreferrer">VLR Technologies</a></p>
   </footer>;
 }
